@@ -1,0 +1,1 @@
+Appliances that talk, capeesh?
