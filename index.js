@@ -82,8 +82,45 @@ var codes = {
 	140:'Warm Up'
 }
 
-function requestEndOfCycleStatus(laundry) {
-  return false
-}
+console.log('test')
+greenBean.connect('laundry', function(laundry) {
+console.log('Connected to some laundries')
 
-module.exports = {requestEndOfCycleStatus}
+loops.while(
+     () => true,
+     () => {
+       return new Promise((resolve, reject) => {
+         setTimeout(() => {
+           laundry.endOfCycle.read(function (endOfCycle) {
+             if(endOfCycle) {
+               console.log('end of cycle')
+               reject(loops.break);
+             } else {
+               console.log('not end of cycle')
+               resolve();
+             }
+           }, 1000);
+         });
+       });
+     }
+   )
+   .then(() => {
+     loops.while(
+       () => true,
+       () => {
+         return new Promise((resolve, reject) => {
+           setTimeout(() => {
+             playBuzzer(),
+             60000);
+           });
+         });
+       }
+     )
+   });
+ })
+
+ function playbuzzer() {
+   player.play('buzzers/chim_60.wav')
+ }
+
+ module.exports = {}

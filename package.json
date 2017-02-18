@@ -1,10 +1,10 @@
 {
   "name": "talkback",
   "version": "1.0.0",
-  "description": "Appliances that talk, capeesh",
+  "description": "Appliances that talk, capeesh?",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/samdup123/talkback#readme",
   "devDependencies": {
-    "jasmine": "^2.5.3"
+    "jasmine": "^2.5.3",
+    "mocha": "^3.2.0"
   }
 }
