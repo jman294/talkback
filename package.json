@@ -19,5 +19,12 @@
   "devDependencies": {
     "jasmine": "^2.5.3",
     "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "async-loops": "^2.0.1",
+    "green-bean": "^0.1.1",
+    "node-uname": "^1.0.1",
+    "play-sound": "^1.1.1",
+    "rpi-gpio": "^0.7.0"
   }
 }

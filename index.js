@@ -1,8 +1,9 @@
-var Player = require('play-sound')(opts = {})
+var player = require('play-sound')(opts = {})
 var greenBean = require('green-bean');
 var uname = require('node-uname');
-var gotPi = false;
+var loops = require('async-loops')
 var fs = require('fs');
+var gotPi = false;
 
 var unameInfo = uname();
 console.log(unameInfo);
@@ -25,19 +26,24 @@ if (gotPi) {
    gpio.on('change', function(channel, value) {
       // When the button is released
       if (value == false) {
-         index++;
-         if (index > Object.keys(languages).length) {
-            index = 1;
-         }
-         language = languages[index];
-         console.log(language);
-         // TODO: When language changes, play an mp3 file with new language
+        if (chime > Object.keys(chimes).length-1) {
+          chime = 1
+        } else {
+          chime++
+        }
       }
+     console.log('chime: '+chime)
    });
    gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH);
 }
 
-var index = 1;
+var chime = 1
+var chimes = {
+  1: 'chime',
+  2: 'chime_big_ben',
+  3: 'chime_x'
+}
+
 // All supported languages
 var languages = {
 	1:'en',
@@ -46,61 +52,29 @@ var languages = {
 }
 // Current language
 var language = languages[1];
-// All cycleSelected values that can be returned from washer or dryer
-var codes = {
-	1:'Basket Clean',
-	2:'Rinse and Spin',
-	3:'Quick Rinse',
-	4:'Bulky Items',
-	5:'Sanitize',
-	6:'Towels and Sheets',
-	7:'Steam refresh',
-	8:'Normal',
-	9:'Whites',
-	10:'Darks',
-	11:'Jeans',
-	12:'Hand Wash',
-	13:'Delicates',
-	14:'Speed Wash',
-	15:'Heavy duty',
-	16:'Allergen',
-	17:'Power Clean',
-	18:'Rinse and Spin',
-	19:'Single Item',
-	128:'Cottons',
-	129:'Easy Care',
-	130:'Active Wear',
-	131:'Time Dry',
-	132:'Dewrinkle',
-	133:'Quick Air Fluff',
-	134:'Steam refresh',
-	135:'Steam Dewrinkle',
-	136:'Speed Dry',
-	137:'Mixed',
-	138:'Speed Dry',
-	139:'Casuals',
-	140:'Warm Up'
-}
 
 console.log('test')
 greenBean.connect('laundry', function(laundry) {
 console.log('Connected to some laundries')
-
+var counter = 1
 loops.while(
      () => true,
      () => {
        return new Promise((resolve, reject) => {
          setTimeout(() => {
            laundry.endOfCycle.read(function (endOfCycle) {
+             console.log(endOfCycle)
              if(endOfCycle) {
                console.log('end of cycle')
                reject(loops.break);
              } else {
+               counter++
+               console.log(counter)  
                console.log('not end of cycle')
                resolve();
              }
-           }, 1000);
-         });
+           });
+         }, 1000);
        });
      }
    )
@@ -109,10 +83,12 @@ loops.while(
        () => true,
        () => {
          return new Promise((resolve, reject) => {
+           playbuzzer()
            setTimeout(() => {
-             playBuzzer(),
-             60000);
-           });
+             console.log('playing buzzer')
+             console.log(counter)
+             resolve()
+           }, 60000);
          });
        }
      )
@@ -120,7 +96,5 @@ loops.while(
  })
 
  function playbuzzer() {
-   player.play('buzzers/chim_60.wav')
+   player.play('buzzers/'+chimes[chime]+'.wav')
  }
-
- module.exports = {}
