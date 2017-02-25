@@ -55,45 +55,18 @@ var language = languages[1];
 
 console.log('test')
 greenBean.connect('laundry', function(laundry) {
-console.log('Connected to some laundries')
-var counter = 1
-loops.while(
-     () => true,
-     () => {
-       return new Promise((resolve, reject) => {
-         setTimeout(() => {
-           laundry.endOfCycle.read(function (endOfCycle) {
-             console.log(endOfCycle)
-             if(endOfCycle) {
-               console.log('end of cycle')
-               reject(loops.break);
-             } else {
-               counter++
-               console.log(counter)  
-               console.log('not end of cycle')
-               resolve();
-             }
-           });
-         }, 1000);
-       });
-     }
-   )
-   .then(() => {
-     loops.while(
-       () => true,
-       () => {
-         return new Promise((resolve, reject) => {
-           playbuzzer()
-           setTimeout(() => {
-             console.log('playing buzzer')
-             console.log(counter)
-             resolve()
-           }, 60000);
-         });
-       }
-     )
-   });
- })
+  console.log('Connected to some laundries')
+  setInterval(function () {
+    laundry.endOfCycle.read(function (value) {
+      if (value === 1) {
+        console.log('end of cycle')
+        playBuzzer()
+      } else {
+        console.log('not end of cycle')
+      }
+    })
+  }, 60000)
+})
 
  function playbuzzer() {
    player.play('buzzers/'+chimes[chime]+'.wav')
