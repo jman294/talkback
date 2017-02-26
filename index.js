@@ -92,7 +92,7 @@ greenBean.connect('laundry', function (laundry) {
   console.log('Connected to some laundries')
   var oldSelection = -10
 
-  function requestCycleStatus (callback) {
+  function requestCycleSelectedStatus (callback) {
     laundry.cycleSelected.read(function (value) {
       // Value parameter is the code returned by the washer describing the cycle selected
       if (value === 0 || codes[value] === undefined) {
@@ -109,22 +109,48 @@ greenBean.connect('laundry', function (laundry) {
       }
     })
   }
+  
+  var beepCount = 0
+  var isEndOfCycle = false
+  function requestEndOfCycleStatus (laundry) {
+    laundry.machineStatus.read(function (machineStatus) {
+      switch (machineStatus) {
+        case 0:
+          // Do not remove this case
+          break
+        case 2:
+          isEndOfCycle = false
+          console.log('in a cycle')
+          break
+        case 4:
+          isEndOfCycle = true
+          console.log('end of cycle')
+          break;
+        default:
+          isEndOfCycle = false
+          console.log(machineStatus)
+          break
+      }
+      if (isEndOfCycle && beepCount % 60 === 0) {
+        beepCount = 0
+        console.log('playing buzzer')
+        playBuzzer()
+      }
+      if (isEndOfCycle) {
+        beepCount++
+      }
+      console.log('beepCount: '+beepCount, ' isEndOfCycle: '+isEndOfCycle)
+    });
+  }
 
   setInterval(function () {
     console.log('Requesting cycle status.')
-    requestCycleStatus()
+    requestCycleSelectedStatus()
   }, 1000)
 
-  setInterval(function () {
-    laundry.endOfCycle.read(function (value) {
-      if (value === 1) {
-        console.log('end of cycle')
-        playBuzzer()
-      } else {
-        console.log('not end of cycle')
-      }
-    })
-  }, 60000)
+  setInterval(function() {
+    requestEndOfCycleStatus(laundry)
+  } , 1000) 
 })
 
 function playBuzzer () {
