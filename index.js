@@ -63,19 +63,22 @@ var codes = {
   17: 'power_clean',
   18: 'rinse_and_spin',
   19: 'single_item',
+  20: 'colors',
+  21: 'cold_wash',
   128: 'cottons',
   129: 'easy_care',
   130: 'active_wear',
   131: 'time_dry',
   132: 'dewrinkle',
-  133: 'quick_air_fluff',
+  133: 'air_fluff',
   134: 'steam_refresh',
   135: 'steam_dewrinkle',
   136: 'speed_dry',
   137: 'mixed',
   138: 'speed_dry',
   139: 'casuals',
-  140: 'warm_up'
+  140: 'warm_up',
+  141: 'energy-saver'
 }
 
 // All supported languages
@@ -109,11 +112,11 @@ greenBean.connect('laundry', function (laundry) {
       }
     })
   }
-  
+
   var beepCount = 0
   var isEndOfCycle = false
-  function requestEndOfCycleStatus (laundry) {
-    laundry.machineStatus.read(function (machineStatus) {
+  function requestMachineStatus (laundry) {
+    laundry.machineStatus.read(function (machineStatus, intervalCounter) {
       switch (machineStatus) {
         case 0:
           // Do not remove this case
@@ -131,7 +134,7 @@ greenBean.connect('laundry', function (laundry) {
           console.log(machineStatus)
           break
       }
-      if (isEndOfCycle && beepCount % 60 === 0) {
+      if (isEndOfCycle && beepCount % 4 === 0) {
         beepCount = 0
         console.log('playing buzzer')
         playBuzzer()
@@ -148,9 +151,13 @@ greenBean.connect('laundry', function (laundry) {
     requestCycleSelectedStatus()
   }, 1000)
 
+  const INTERVAL = 60000
+  const CHECK_INTERVAL = 15000
+  const INTERVAL_COUNTER = INTERVAL/CHECK_INTERVAL
+
   setInterval(function() {
-    requestEndOfCycleStatus(laundry)
-  } , 1000) 
+    requestMachineStatus(laundry, INTERVAL_COUNTER)
+  } , CHECK_INTERVAL)
 })
 
 function playBuzzer () {
