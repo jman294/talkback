@@ -106,7 +106,7 @@ greenBean.connect('laundry', function (laundry) {
           }
           oldSelection = value
           console.log('Playing a sound for the new selection.')
-          playCycleCode(value)
+          playSound(getCycleCodeSoundPath(value))
         }
       })
     }
@@ -122,7 +122,7 @@ greenBean.connect('laundry', function (laundry) {
         if (machineStatus === 4) {
           isEndOfCycle = true
         } else {
-          // 0: Off (We still want it to buzz when it is off)
+          // 0: Off (We still want isEndOfCycle to be true when it is off)
           if (machineStatus !== 0) {
             beepCount = 0
             isEndOfCycle = false
@@ -133,7 +133,7 @@ greenBean.connect('laundry', function (laundry) {
           if (beepCount % intervalCounter === 0) {
             beepCount = 0
             console.log('playing buzzer')
-            playBuzzer()
+            playSound('./buzzers/' + chimes[chime] + '.wav')
           }
         }
       })
@@ -150,15 +150,14 @@ greenBean.connect('laundry', function (laundry) {
   } , CHECK_INTERVAL)
 })
 
-function playBuzzer () {
-  player.play('buzzers/' + chimes[chime] + '.wav')
+function getCycleCodeSoundPath (code) {
+  return './voices/' + language + '/' + codes[code] + '.mp3'
 }
 
-function playCycleCode (code) {
-  var soundFile = './voices/' + language + '/' + codes[code] + '.mp3'
-  if (fs.existsSync(soundFile)) {
-    player.play(soundFile)
+function playSound (path) {
+  if (fs.existsSync(path)) {
+    player.play(path)
   } else {
-    console.log('Sound file does not exist: ' + soundFile)
+    console.error('Sound file does not exist: ' + path)
   }
 }
