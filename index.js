@@ -5,14 +5,9 @@ var fs = require('fs')
 var gotPi = false
 
 var unameInfo = uname()
-console.log(unameInfo)
-console.log('Type: ' + typeof (unameInfo))
 if (unameInfo.machine) {
-  console.log('Machine: ' + unameInfo.machine)
   if (unameInfo.machine.indexOf('x86') === 0) {
-    console.log("This is not a pi so we can't update the board.")
   } else {
-    console.log('This machine is not x86, so maybe we can update.')
     gotPi = true
   }
 } else {
@@ -31,7 +26,6 @@ if (gotPi) {
         chime++
       }
     }
-    console.log('chime: ' + chime)
   })
   gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH)
 }
@@ -90,70 +84,66 @@ var languages = {
 // Current language
 var language = languages[1]
 
-console.log('test')
+const INTERVAL = 60000
+const CHECK_INTERVAL = 15000
+const INTERVAL_COUNTER = INTERVAL/CHECK_INTERVAL
+
 greenBean.connect('laundry', function (laundry) {
   console.log('Connected to some laundries')
-  var oldSelection = -10
 
-  function requestCycleSelectedStatus (callback) {
-    laundry.cycleSelected.read(function (value) {
-      // Value parameter is the code returned by the washer describing the cycle selected
-      if (value === 0 || codes[value] === undefined) {
-        console.error('Selection is Undefined or unknown: ' + value)
-      } else {
-        console.log('New selection : ' + value + ', which is ' + codes[value])
-        if (value === oldSelection) {
-          console.log('The selection did not change.')
-          return
+  var requestCycleSelectedStatus = (function (callback) {
+    var oldSelection = -10
+    return function () {
+      laundry.cycleSelected.read(function (value) {
+        // Value parameter is the code returned by the washer describing the cycle selected
+        if (value === 0 || codes[value] === undefined) {
+          console.error('Selection is Undefined or unknown: ' + value)
+        } else {
+          console.log('New selection : ' + value + ', which is ' + codes[value])
+          if (value === oldSelection) {
+            console.log('The selection did not change.')
+            return
+          }
+          oldSelection = value
+          console.log('Playing a sound for the new selection.')
+          playCycleCode(value)
         }
-        oldSelection = value
-        console.log('Playing a sound for the new selection.')
-        playCycleCode(value)
-      }
-    })
-  }
+      })
+    }
+  })()
 
-  var beepCount = 0
-  var isEndOfCycle = false
-  function requestMachineStatus (laundry) {
-    laundry.machineStatus.read(function (machineStatus, intervalCounter) {
-      switch (machineStatus) {
-        case 0:
-          // Do not remove this case
-          break
-        case 2:
-          isEndOfCycle = false
-          console.log('in a cycle')
-          break
-        case 4:
+  var requestMachineStatus = (function () {
+    var beepCount = 0
+    var isEndOfCycle = false
+    return function (laundry, intervalCounter) {
+      console.log('beepCount: '+beepCount, ' isEndOfCycle: '+isEndOfCycle, + ' ' + intervalCounter)
+      laundry.machineStatus.read(function (machineStatus) {
+        // 4: End of cycle
+        if (machineStatus === 4) {
           isEndOfCycle = true
-          console.log('end of cycle')
-          break;
-        default:
-          isEndOfCycle = false
-          console.log(machineStatus)
-          break
-      }
-      if (isEndOfCycle && beepCount % 4 === 0) {
-        beepCount = 0
-        console.log('playing buzzer')
-        playBuzzer()
-      }
-      if (isEndOfCycle) {
-        beepCount++
-      }
-      console.log('beepCount: '+beepCount, ' isEndOfCycle: '+isEndOfCycle)
-    });
-  }
+        } else {
+          // 0: Off (We still want it to buzz when it is off)
+          if (machineStatus !== 0) {
+            beepCount = 0
+            isEndOfCycle = false
+          }
+        }
+        if (isEndOfCycle) {
+          beepCount++
+          if (beepCount % intervalCounter === 0) {
+            beepCount = 0
+            console.log('playing buzzer')
+            playBuzzer()
+          }
+        }
+      })
+    }
+  })()
 
   setInterval(function () {
     console.log('Requesting cycle status.')
     requestCycleSelectedStatus()
   }, 1000)
-
-  const INTERVAL = 60000
-  const CHECK_INTERVAL = 15000
-  const INTERVAL_COUNTER = INTERVAL/CHECK_INTERVAL
 
   setInterval(function() {
     requestMachineStatus(laundry, INTERVAL_COUNTER)
