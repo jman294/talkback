@@ -1,25 +1,25 @@
 var Player = require('play-sound')(opts = {})
-var greenBean = require('green-bean');
-var uname = require('node-uname');
+var greenBean = require('green-bean')
+var uname = require('node-uname')
 var assert = require('assert')
 
-var doubleIntervalFunction = function() {
+var doubleIntervalFunction = function () {
   loops.while(
        () => true,
        () => {
          return new Promise((resolve, reject) => {
            setTimeout(() => {
              laundry.endOfCycle.read(function (endOfCycle) {
-               if(endOfCycle) {
+               if (endOfCycle) {
                  console.log('end of cycle')
-                 reject(loops.break);
+                 reject(loops.break)
                } else {
                  console.log('not end of cycle')
-                 resolve();
+                 resolve()
                }
-             }, 1000);
-           });
-         });
+             }, 1000)
+           })
+         })
        }
      )
      .then(() => {
@@ -28,19 +28,14 @@ var doubleIntervalFunction = function() {
          () => {
            return new Promise((resolve, reject) => {
              setTimeout(() => {
-               playBuzzer(),
-               60000);
-             });
-           });
+               playBuzzer()
+             }, 60000)
+           })
          }
        )
+     })
 
-   function playbuzzer() {
-     player.play('buzzers/chim_60.wav')
-   }
+  function playbuzzer () {
+    player.play('buzzers/chim_60.wav')
+  }
 }
-
-describe('#EndOfCycleStatus()', ()=> {
-  it('should return false if cycle is ongoing', ()=> {
-  })
-})
