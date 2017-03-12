@@ -18,12 +18,12 @@ if (gotPi) {
   var gpio = require('rpi-gpio')
 
   gpio.on('change', function (channel, value) {
+    console.log(languages[language])
     // When the button is released
     if (value === false) {
-      if (language > Object.keys(language).length - 1) {
+      language++
+      if (language > languages.length - 1) {
         language = 0
-      } else {
-        language++
       }
     }
   })
