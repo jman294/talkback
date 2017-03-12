@@ -20,22 +20,32 @@ if (gotPi) {
   gpio.on('change', function (channel, value) {
     // When the button is released
     if (value === false) {
-      if (chime > Object.keys(chimes).length - 1) {
-        chime = 1
+      if (language > Object.keys(language).length - 1) {
+        language = 0
       } else {
-        chime++
+        language++
       }
     }
   })
   gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH)
 }
 
-var chime = 1
-var chimes = {
-  1: 'chime',
-  2: 'chime_big_ben',
-  3: 'chime_x'
-}
+// All supported languages
+var languages = [
+  'en',
+  'es'
+]
+// Current language
+var language = 0
+
+// List of chimes
+var chimes = [
+  'chime',
+  'chime_big_ben',
+  'chime_x'
+]
+// Current chime
+var chime = 0
 
 var codes = {
   1: 'basket_clean',
@@ -74,15 +84,6 @@ var codes = {
   140: 'warm_up',
   141: 'energy-saver'
 }
-
-// All supported languages
-var languages = {
-  1: 'en',
-  2: 'cn',
-  3: 'es'
-}
-// Current language
-var language = languages[1]
 
 const INTERVAL = 60000
 const CHECK_INTERVAL = 15000
@@ -147,11 +148,11 @@ greenBean.connect('laundry', function (laundry) {
 
   setInterval(function() {
     requestMachineStatus(laundry, INTERVAL_COUNTER)
-  } , CHECK_INTERVAL)
+  }, CHECK_INTERVAL)
 })
 
 function getCycleCodeSoundPath (code) {
-  return './voices/' + language + '/' + codes[code] + '.mp3'
+  return './voices/' + languages[language] + '/' + codes[code] + '.mp3'
 }
 
 function playSound (path) {
