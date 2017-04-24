@@ -1,69 +1,65 @@
-/*
- * This application will show detailed information about an appliance.
- *
- * Copyright (c) 2014 General Electric
- *  
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *  
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * 
- */
-
 var gea = require("gea-sdk");
 var adapter = require("gea-adapter-usb");
 var say = require('say')
-var talkback = require('../talkback')
-
-var WASHER =  'washer'
-var DRYER = 'dryer'
 
 var app = gea.configure({
-    address: 0xcb,
-    version: [ 0, 0, 1, 0 ]
+  address: 0xcb,
+  version: [ 0, 0, 1, 0 ]
 });
 
-var destinations = [
-  {
-    address: 0x2b, 
-    name: WASHER
-  },
-  {
-    address: 0x23, 
-    name: DRYER
-  }
-]
-console.log(talkback)
+var SOURCE = 0xcb
 
-//app.bind(adapter, function (bus) {
-talkback.init().then(function (bus) {
+var WASHER =  0x2b
+var DRYER = 0x23
+
+var TIME_SECS = 0x2007
+var TIME_MINS = 0x0046
+var CYCLE_SELECTED = 0x200A
+
+app.bind(adapter, function (bus) {
   bus.on("read-response", function(erd) {
-    for (var dest in destinations) {
-      if (erd.source === destinations[dest].address) {
-        console.log('The '+destinations[dest].name+' returned '+erd.data[1])
-      }
+    switch (erd.erd) {
+      case TIME_SECS:
+        console.log('time in seconds', erd.data)
+        break
+
+      case TIME_MINS:
+        console.log('time in mins', erd.data)
+        break
+
+      case CYCLE_SELECTED:
+        console.log(erd.data)
+        break
     }
   });
   setInterval(function() {
-    bus.read({
-      erd: 0x2007,
-      source: 0xcb,
-      destination: destinations[0].address
-    });
-    bus.read({
-      erd: 0x0046,
-      source: 0xcb,
-      destination: destinations[1].address
-    });
-  }, 2000);
+    busRead(bus, SOURCE, TIME_SECS, [WASHER])
+    busRead(bus, SOURCE, TIME_MINS, [DRYER])
+    busRead(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
+    //bus.read({
+      //erd: TIME_SECS,
+      //source: SOURCE,
+      //destination: WASHER
+    //});
+    //bus.read({
+      //erd: TIME_MINS,
+      //source: SOURCE,
+      //destination: DRYER
+    //});
+    //bus.read({
+      //erd: CYCLE_SELECTED,
+      //source: SOURCE,
+      //destination: DRYER
+    //});
+  }, 1000);
 });
 
+function busRead (bus, source, erd, destinations) {
+  destinations.map(function (dest) {
+    bus.read({
+      erd: erd,
+      source: source,
+      destination: dest
+    })
+  })
+}
