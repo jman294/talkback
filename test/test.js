@@ -2,78 +2,100 @@ var gea = require("gea-sdk");
 var adapter = require("gea-adapter-usb");
 var say = require('say')
 var player = require('play-sound')({})
+var gpio = require('rpi-gpio')
 
 var app = gea.configure({
   address: 0xcb,
   version: [ 0, 0, 1, 0 ]
 });
 
-//player.play('./voices/en/
-var SOURCE = 0xcb
+gpio.on('change', function (channel, value) {
+  states[0].sayTime = true
+  console.log('button')
+})
+gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH)
 
-var WASHER =  0x23
-var DRYER = 0x2b
+  var SOURCE = 0xcb
 
-var TIME_SECS = 0x2007
-var TIME_MINS = 0x0046
-var CYCLE_SELECTED = 0x200A
+  var WASHER =  0x23
+  var DRYER = 0x2b
 
-var states = [
+  var TIME_SECS = 0x2007
+  var TIME_MINS = 0x0046
+  var CYCLE_SELECTED = 0x200A
+  var END_CYCLE = 0x2002
+
+  var READ_INTERVAL = 1000
+
+  var states = [
 {
   id: WASHER,
   oldCycle: 0,
+  sayTime: false,
+  counter: 0,
+  secondsPassed: 0,
   name: 'washer'
 },
 {
   id: DRYER,
   oldCycle: 0,
+  sayTime: false,
+  counter: 0,
+  secondsPassed: 0,
   name: 'dryer'
 }
-]
+  ]
 
-app.bind(adapter, function (bus) {
-  bus.on("read-response", function(erd) {
-    switch (erd.erd) {
-      case TIME_SECS:
-        //console.log('time in seconds', erd.data)
-        break
+  app.bind(adapter, function (bus) {
+    bus.on("read-response", function(erd) {
+      switch (erd.erd) {
+        case TIME_SECS:
+          break
 
-      case TIME_MINS:
-        //console.log('time in mins', erd.data)
-        break
-
-      case CYCLE_SELECTED:
-        var cycleSelected = erd.data[0]
-        for (var state in states) {
-          if (erd.source === states[state].id ) {
-            if (cycleSelected !== states[state].oldCycle) {
-              console.log('new', states[state].name, 'cycle:', cycleSelected)
-              playCycle(cycleSelected)
-            } else {
-              //console.log('same cycle')
+        case TIME_MINS:
+          var timeRemaining = erd.data[1]
+          for (var state in states) {
+            if (erd.source === states[state].id ) {
+              if (states[state].sayTime) {
+                say.speak(timeRemaining+' minutes left', .1)
+                states[state].sayTime = false
+              }
             }
-            states[state].oldCycle = cycleSelected
           }
-        }
-        break
-    }
+          break
+
+        case CYCLE_SELECTED:
+          var cycleSelected = erd.data[0]
+            for (var state in states) {
+              if (erd.source === states[state].id ) {
+                if (cycleSelected !== states[state].oldCycle) {
+                  //console.log('new', states[state].name, 'cycle:', cycleSelected)
+                  playCycle(cycleSelected)
+                } else {
+                  //console.log('same cycle')
+                }
+                states[state].oldCycle = cycleSelected
+              }
+            }
+          break
+
+        case END_CYCLE:
+          var cycleEnd = erd.data[0]
+          for (var state in states) {
+            if (erd.source === states[state].id ) {
+              //states[state].
+            }
+          }
+          break
+      }
+    });
+    setInterval(function() {
+      busRead(bus, SOURCE, TIME_SECS, [DRYER])
+        busRead(bus, SOURCE, TIME_MINS, [WASHER])
+        busRead(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
+        //busRead(bus, SOURCE, END_CYCLE, [WASHER, DRYER])
+    }, READ_INTERVAL);
   });
-  setInterval(function() {
-    //busRead(bus, SOURCE, TIME_SECS, [WASHER])
-    //busRead(bus, SOURCE, TIME_MINS, [DRYER])
-    //busRead(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
-    bus.read({
-      erd: CYCLE_SELECTED,
-      source: SOURCE,
-      destination: WASHER
-    });
-    bus.read({
-      erd: CYCLE_SELECTED,
-      source: SOURCE,
-      destination: DRYER
-    });
-  }, 1000);
-});
 
 function busRead (bus, source, erd, destinations) {
   destinations.map(function (dest) {
@@ -123,7 +145,7 @@ var playCycle = (function () {
     140: 'warm_up',
     141: 'energy-saver'
   }
-  
+
   return function (value) {
     player.play('./voices/en/'+codes[value]+'.mp3')
   }
