@@ -50,6 +50,8 @@ gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH)
     bus.on("read-response", function(erd) {
       switch (erd.erd) {
         case TIME_SECS:
+          var bytes = erd.data
+          console.log(Math.round((bytes[0]*255 + bytes[1])/60))
           break
 
         case TIME_MINS:
