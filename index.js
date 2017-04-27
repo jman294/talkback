@@ -87,7 +87,7 @@ var codes = {
 
 const INTERVAL = 60000
 const CHECK_INTERVAL = 15000
-const INTERVAL_COUNTER = INTERVAL/CHECK_INTERVAL
+const INTERVAL_COUNTER = INTERVAL / CHECK_INTERVAL
 
 greenBean.connect('laundry', function (laundry) {
   console.log('Connected to some laundries')
@@ -117,7 +117,7 @@ greenBean.connect('laundry', function (laundry) {
     var beepCount = 0
     var isEndOfCycle = false
     return function (laundry, intervalCounter) {
-      console.log('beepCount: '+beepCount, ' isEndOfCycle: '+isEndOfCycle, + ' ' + intervalCounter)
+      console.log('beepCount: ' + beepCount, ' isEndOfCycle: ' + isEndOfCycle, +' ' + intervalCounter)
       laundry.machineStatus.read(function (machineStatus) {
         // 4: End of cycle
         if (machineStatus === 4) {
@@ -146,7 +146,7 @@ greenBean.connect('laundry', function (laundry) {
     requestCycleSelectedStatus()
   }, 1000)
 
-  setInterval(function() {
+  setInterval(function () {
     requestMachineStatus(laundry, INTERVAL_COUNTER)
   }, CHECK_INTERVAL)
 })
