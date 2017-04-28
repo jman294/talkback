@@ -25,6 +25,7 @@
     "green-bean": "^0.1.1",
     "node-uname": "^1.0.1",
     "play-sound": "^1.1.1",
-    "rpi-gpio": "^0.7.0"
+    "rpi-gpio": "^0.7.0",
+    "text-to-speech-js": "^1.1.6"
   }
 }
