@@ -33,6 +33,7 @@ var states = [
     oldCycle: 0,
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
+    knobTurned: false,
     name: 'washer'
   },
   {
@@ -40,6 +41,7 @@ var states = [
     oldCycle: 0,
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
+    knobTurned: false,
     name: 'dryer'
   }
 ]
@@ -53,6 +55,7 @@ app.bind(adapter, function (bus) {
           if (erd.source === states[state].id) {
             if (machineStatus === 2) {
               if (states[state].cycleRunAlert) {
+                // Pressed Start Button
                 states[state].cycleRunAlert = false
                 say.speak(
                     'Starting '
@@ -69,11 +72,19 @@ app.bind(adapter, function (bus) {
         }
         break
 
-      case WATER_TEMP:
-        var tempCode = erd.data[0]
-        console.log(tempCode)
-        say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
-        break
+      //case WATER_TEMP:
+        //var tempCode = erd.data[0]
+        //for (var state in states) {
+          //if (erd.source === states[state].id) {
+            //if (!states[state].knobTurned) {
+              //say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
+            //}
+            //states[state].knobTurned = false
+          //}
+        //}
+        //console.log(tempCode)
+        //say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
+        //break
 
       case TIME_SECS:
         var bytes = erd.data
@@ -103,12 +114,13 @@ app.bind(adapter, function (bus) {
         for (var state in states) {
           if (erd.source === states[state].id) {
             if (cycleSelected !== states[state].oldCycle) {
-                  // console.log('new', states[state].name, 'cycle:', cycleSelected)
+              // console.log('new', states[state].name, 'cycle:', cycleSelected)
               say.speak(getReadableCycleName(cycleSelected))
             } else {
-                  // console.log('same cycle')
+              // console.log('same cycle')
             }
             states[state].oldCycle = cycleSelected
+            states[state].knobTurned = true
           }
         }
         break
@@ -126,7 +138,7 @@ app.bind(adapter, function (bus) {
   busSubscribe(bus, SOURCE, TIME_SECS, [DRYER])
   busSubscribe(bus, SOURCE, TIME_MINS, [WASHER])
   busSubscribe(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
-  busSubscribe(bus, SOURCE, WATER_TEMP, [WASHER, DRYER])
+  //busSubscribe(bus, SOURCE, WATER_TEMP, [WASHER, DRYER])
   busSubscribe(bus, SOURCE, MACHINE_STATUS, [WASHER, DRYER])
 })
 
