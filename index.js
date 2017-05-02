@@ -3,17 +3,14 @@ var adapter = require('gea-adapter-usb')
 var say = require('say')
 var player = require('play-sound')({})
 var gpio = require('rpi-gpio')
+var fs = require('fs')
 
 var app = gea.configure({
   address: 0xcb,
   version: [ 0, 0, 1, 0 ]
 })
 
-gpio.on('change', function (channel, value) {
-  states[0].sayTime = true
-  console.log('button')
-})
-gpio.setup(7, gpio.DIR_IN, gpio.EDGE_BOTH)
+var PATH = '/sys/class/gpio'
 
 var SOURCE = 0xcb
 
@@ -27,21 +24,39 @@ var END_CYCLE = 0x2002
 var WATER_TEMP = 0x2016
 var MACHINE_STATUS = 0x2000
 
+fs.readFile(PATH + '/gpio' + 17 + '/value', function (err, data) {
+  console.log(data.toString())
+})
+
+setInterval(function () {
+  for (state in states) {
+    fs.readFile(PATH + '/gpio' + states[state].pinNo + '/value', function (err, data) {
+      states[state].sayTime = data === '1'
+    })
+  }
+}, 100)
+
+
+
 var states = [
   {
     id: WASHER,
+    pinNo: 4,
     oldCycle: 0,
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     knobTurned: false,
+    sayTime: false,
     name: 'washer'
   },
   {
     id: DRYER,
+    pinNo: 17,
     oldCycle: 0,
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     knobTurned: false,
+    sayTime: false,
     name: 'dryer'
   }
 ]
