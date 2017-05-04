@@ -31,7 +31,7 @@ var states = [
     oldCycle: 0,
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
-    buttonPressed: false,
+    sayTime: false,
     name: 'washer'
   },
   {
@@ -40,7 +40,7 @@ var states = [
     oldCycle: 0,
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
-    buttonPressed: false,
+    sayTime: false,
     name: 'dryer'
   }
 ]
@@ -50,13 +50,7 @@ setInterval(function () {
     fs.readFile(PATH + '/gpio' + state.pinNo + '/value', function (err, data) {
       if (err) throw err
       if (data == 0) {
-        if (!state.buttonPressed) {
-          say.speak('Estimated time remaining: '.concat(state.oldMinutesRemaining).concat('minutes'))
-          console.log(state.name + ' button pressed')
-        }
-        state.buttonPressed = true
-      } else {
-        state.buttonPressed = false
+        console.log(state.name + ' button pressed')
       }
     })
   })
@@ -117,6 +111,10 @@ app.bind(adapter, function (bus) {
         for (var state in states) {
           if (erd.source === states[state].id) {
             states[state].oldMinutesRemaining = timeRemaining
+            if (states[state].sayTime) {
+              say.speak(timeRemaining + ' minutes left', 0.1)
+              states[state].sayTime = false
+            }
           }
         }
         break
