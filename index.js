@@ -51,7 +51,7 @@ setInterval(function () {
       if (err) throw err
       if (data == 0) {
         if (!state.buttonPressed) {
-          say.speak('Estimated time remaining: '.concat(state.oldMinutesRemaining).concat('minutes'))
+          say.speak('Estimated time remaining: '.concat(state.oldMinutesRemaining).concat('minutes'), 'voice_us2_mbrola')
           console.log(state.name + ' button pressed')
         }
         state.buttonPressed = true
@@ -79,7 +79,7 @@ app.bind(adapter, function (bus) {
                     .concat(', with an estimated ')
                     .concat(states[state].oldMinutesRemaining)
                     .concat(' minutes remaining.')
-                )
+                , 'voice_us2_mbrola')
               }
             } else {
               states[state].cycleRunAlert = true
@@ -126,7 +126,7 @@ app.bind(adapter, function (bus) {
         for (var state in states) {
           if (erd.source === states[state].id) {
             if (cycleSelected !== states[state].oldCycle) {
-              say.speak(getReadableCycleName(cycleSelected))
+              say.speak(getReadableCycleName(cycleSelected), 'voice_us2_mbrola')
             }
             states[state].oldCycle = cycleSelected
           }
