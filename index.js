@@ -1,3 +1,4 @@
+var loudness = require('loudness')
 var gea = require('gea-sdk')
 var adapter = require('gea-adapter-usb')
 var say = require('say')
@@ -51,14 +52,26 @@ setInterval(function () {
       if (err) throw err
       if (data == 0) {
         if (!state.buttonPressed) {
-          say.speak('Estimated time remaining: '.concat(state.oldMinutesRemaining).concat('minutes'), 'voice_us2_mbrola')
-          console.log(state.name + ' button pressed')
+          say.speak('About '.concat(state.oldMinutesRemaining).concat(' minutes left on the ').concat(state.name), 'voice_us2_mbrola')
         }
         state.buttonPressed = true
       } else {
         state.buttonPressed = false
       }
     })
+  })
+}, 100)
+
+setInterval(function () {
+  var regex = /\n$/
+  var pin1 = fs.readFileSync(PATH + '/gpio26/value').toString().replace(regex, '')
+  var pin2 = fs.readFileSync(PATH + '/gpio13/value').toString().replace(regex, '')
+  var pin3 = fs.readFileSync(PATH + '/gpio6/value').toString().replace(regex, '')
+  var pin4 = fs.readFileSync(PATH + '/gpio27/value').toString().replace(regex, '')
+  console.log(pin1.concat(pin2).concat(pin3).concat(pin4))
+  var num = parseInt(pin1.concat(pin2).concat(pin3).concat(pin4), 2)
+  loudness.setVolume(100-num, function (err) {
+     if (err) throw err
   })
 }, 100)
 
@@ -150,7 +163,6 @@ app.bind(adapter, function (bus) {
 })
 
 function busSubscribe (bus, source, erd, destinations) {
-   console.log('subscribe')
   destinations.map(function (dest) {
     bus.subscribe({
       erd: erd,

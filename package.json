@@ -23,6 +23,7 @@
   "dependencies": {
     "async-loops": "^2.0.1",
     "green-bean": "^0.1.1",
+    "loudness": "^0.2.2",
     "node-uname": "^1.0.1",
     "play-sound": "^1.1.1",
     "rpi-gpio": "^0.8.1",
