@@ -62,15 +62,34 @@ setInterval(function () {
   })
 }, 100)
 
+var encodings = {
+   "0101": 1,
+   "0100": 2,
+   "0000": 3,
+   "0001": 4,
+   "0011": 5,
+   "0010": 6,
+   "0110": 7,
+   "0111": 8,
+   "1111": 9,
+   "1110": 10,
+   "1010": 11,
+   "1011": 12,
+   "1001": 13,
+   "1000": 14,
+   "1100": 15,
+   "1101": 16
+}
+
 setInterval(function () {
   var regex = /\n$/
   var pin1 = fs.readFileSync(PATH + '/gpio26/value').toString().replace(regex, '')
   var pin2 = fs.readFileSync(PATH + '/gpio13/value').toString().replace(regex, '')
   var pin3 = fs.readFileSync(PATH + '/gpio6/value').toString().replace(regex, '')
   var pin4 = fs.readFileSync(PATH + '/gpio27/value').toString().replace(regex, '')
-  console.log(pin1.concat(pin2).concat(pin3).concat(pin4))
-  var num = parseInt(pin1.concat(pin2).concat(pin3).concat(pin4), 2)
-  loudness.setVolume(100-num, function (err) {
+  var num = pin1.concat(pin2).concat(pin3).concat(pin4)
+  console.log(num, encodings[num])
+  loudness.setVolume(90-encodings[num], function (err) {
      if (err) throw err
   })
 }, 100)
