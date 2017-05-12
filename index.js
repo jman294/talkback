@@ -33,6 +33,7 @@ var states = [
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     buttonPressed: false,
+    knobTurned: false,
     name: 'washer'
   },
   {
@@ -42,6 +43,7 @@ var states = [
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     buttonPressed: false,
+    knobTurned: false,
     name: 'dryer'
   }
 ]
@@ -88,7 +90,6 @@ setInterval(function () {
   var pin3 = fs.readFileSync(PATH + '/gpio6/value').toString().replace(regex, '')
   var pin4 = fs.readFileSync(PATH + '/gpio27/value').toString().replace(regex, '')
   var num = pin1.concat(pin2).concat(pin3).concat(pin4)
-  console.log(num, encodings[num])
   loudness.setVolume(90-encodings[num], function (err) {
      if (err) throw err
   })
@@ -110,7 +111,7 @@ app.bind(adapter, function (bus) {
                     .concat(getReadableCycleName(states[state].oldCycle))
                     .concat(', with an estimated ')
                     .concat(states[state].oldMinutesRemaining)
-                    .concat(' minutes remaining.')
+                    .concat(' minutes left.')
                 , 'voice_us2_mbrola')
               }
             } else {
@@ -120,19 +121,18 @@ app.bind(adapter, function (bus) {
         }
         break
 
-      //case WATER_TEMP:
-        //var tempCode = erd.data[0]
-        //for (var state in states) {
-          //if (erd.source === states[state].id) {
-            //if (!states[state].knobTurned) {
-              //say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
-            //}
-            //states[state].knobTurned = false
-          //}
-        //}
-        //console.log(tempCode)
-        //say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
-        //break
+      case WATER_TEMP:
+        var tempCode = erd.data[0]
+        for (var state in states) {
+          if (erd.source === states[state].id) {
+            console.log(states[state].name, states[state].knobTurned)
+            if (!states[state].knobTurned) {
+              say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
+            }
+            states[state].knobTurned = false
+          }
+        }
+        break
 
       case TIME_SECS:
         var bytes = erd.data
@@ -157,6 +157,7 @@ app.bind(adapter, function (bus) {
         var cycleSelected = erd.data[0]
         for (var state in states) {
           if (erd.source === states[state].id) {
+            states[state].knobTurned = true
             if (cycleSelected !== states[state].oldCycle) {
               say.speak(getReadableCycleName(cycleSelected), 'voice_us2_mbrola')
             }
