@@ -23,6 +23,8 @@ var TIME_MINS = 0x0046
 var CYCLE_SELECTED = 0x200A
 var END_CYCLE = 0x2002
 var WATER_TEMP = 0x2016
+var SPIN_LEVEL = 0x2017
+var SOIL_LEVEL = 0x2015
 var MACHINE_STATUS = 0x2000
 
 var states = [
@@ -33,7 +35,8 @@ var states = [
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     buttonPressed: false,
-    knobTurned: false,
+    knobTurned: [false, false, false],
+    inACycle: false,
     name: 'washer'
   },
   {
@@ -43,7 +46,8 @@ var states = [
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     buttonPressed: false,
-    knobTurned: false,
+    knobTurned: [false, false, false],
+    inACycle: false,
     name: 'dryer'
   }
 ]
@@ -53,7 +57,7 @@ setInterval(function () {
     fs.readFile(PATH + '/gpio' + state.pinNo + '/value', function (err, data) {
       if (err) throw err
       if (data == 0) {
-        if (!state.buttonPressed) {
+        if (!state.buttonPressed && state.inACycle) {
           say.speak('About '.concat(state.oldMinutesRemaining).concat(' minutes left on the ').concat(state.name), 'voice_us2_mbrola')
         }
         state.buttonPressed = true
@@ -103,6 +107,7 @@ app.bind(adapter, function (bus) {
         for (var state in states) {
           if (erd.source === states[state].id) {
             if (machineStatus === 2) {
+              states[state].inACycle = true
               if (states[state].cycleRunAlert) {
                 // Pressed Start Button
                 states[state].cycleRunAlert = false
@@ -115,8 +120,36 @@ app.bind(adapter, function (bus) {
                 , 'voice_us2_mbrola')
               }
             } else {
+              states[state].inACycle = false
               states[state].cycleRunAlert = true
             }
+          }
+        }
+        break
+
+      case SPIN_LEVEL:
+        var tempCode = erd.data[0]
+        for (var state in states) {
+          if (erd.source === states[state].id) {
+            console.log(states[state].name, states[state].knobTurned)
+            if (!states[state].knobTurned[0]) {
+              say.speak('Spin level, '.concat(getSpinLevelByCode(tempCode)))
+            }
+            states[state].knobTurned[0] = false
+          }
+        }
+        break
+
+      case SOIL_LEVEL:
+        //console.log('Soiled it soiled it')
+        var tempCode = erd.data[0]
+        for (var state in states) {
+          if (erd.source === states[state].id) {
+            console.log(states[state].name, states[state].knobTurned)
+            if (!states[state].knobTurned[1]) {
+              say.speak('Soil level, '.concat(getSoilLevelByCode(tempCode)))
+            }
+            states[state].knobTurned[1] = false
           }
         }
         break
@@ -126,10 +159,10 @@ app.bind(adapter, function (bus) {
         for (var state in states) {
           if (erd.source === states[state].id) {
             console.log(states[state].name, states[state].knobTurned)
-            if (!states[state].knobTurned) {
+            if (!states[state].knobTurned[2]) {
               say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
             }
-            states[state].knobTurned = false
+            states[state].knobTurned[2] = false
           }
         }
         break
@@ -157,10 +190,10 @@ app.bind(adapter, function (bus) {
         var cycleSelected = erd.data[0]
         for (var state in states) {
           if (erd.source === states[state].id) {
-            states[state].knobTurned = true
-            if (cycleSelected !== states[state].oldCycle) {
-              say.speak(getReadableCycleName(cycleSelected), 'voice_us2_mbrola')
+            for (let i in states[state].knobTurned) {
+              states[state].knobTurned[i] = true
             }
+            say.speak(getReadableCycleName(cycleSelected), 'voice_us2_mbrola')
             states[state].oldCycle = cycleSelected
           }
         }
@@ -178,8 +211,10 @@ app.bind(adapter, function (bus) {
   busSubscribe(bus, SOURCE, TIME_SECS, [DRYER])
   busSubscribe(bus, SOURCE, TIME_MINS, [WASHER])
   busSubscribe(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
-  //busSubscribe(bus, SOURCE, WATER_TEMP, [WASHER, DRYER])
+  busSubscribe(bus, SOURCE, WATER_TEMP, [WASHER, DRYER])
   busSubscribe(bus, SOURCE, MACHINE_STATUS, [WASHER, DRYER])
+  busSubscribe(bus, SOURCE, SOIL_LEVEL, [WASHER, DRYER])
+  busSubscribe(bus, SOURCE, SPIN_LEVEL, [WASHER, DRYER])
 })
 
 function busSubscribe (bus, source, erd, destinations) {
@@ -202,6 +237,35 @@ var busRead = function (bus, source, erd, destinations) {
   })
 }
 
+var getSoilLevelByCode = (function () {
+  var codes = {
+    0: 'extra light',
+    1: 'light',
+    2: 'normal',
+    3: 'heavy',
+    4: 'extra heavy'
+  }
+
+  return function (code) {
+    return codes[code]
+  }
+})()
+
+var getSpinLevelByCode = (function () {
+  var codes = {
+    0: 'no spin',
+    1: 'unused',
+    2: 'medium',
+    3: 'high',
+    4: 'extra high',
+    5: 'disabled'
+  }
+
+  return function (code) {
+    return codes[code]
+  }
+})()
+
 var getTempByCode = (function () {
   var codes = {
     21: 'hot',
@@ -219,6 +283,7 @@ var getTempByCode = (function () {
 
 var getCycleByCode = (function () {
   var codes = {
+    0: 'blank',
     1: 'basket_clean',
     2: 'rinse_and_spin',
     3: 'quick_rinse',
@@ -257,6 +322,7 @@ var getCycleByCode = (function () {
   }
 
   return function (code) {
+    console.log(code)
     return codes[code]
   }
 })()
