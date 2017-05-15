@@ -11,13 +11,16 @@ var app = gea.configure({
   version: [ 0, 0, 1, 0 ]
 })
 
+// Path for Raspberry PI GPIO
 var PATH = '/sys/class/gpio'
 
+// Washer and Dryer constants
 var SOURCE = 0xcb
 
 var WASHER = 0x23
 var DRYER = 0x2b
 
+// ERD address constants
 var TIME_SECS = 0x2007
 var TIME_MINS = 0x0046
 var CYCLE_SELECTED = 0x200A
@@ -27,6 +30,7 @@ var SPIN_LEVEL = 0x2017
 var SOIL_LEVEL = 0x2015
 var MACHINE_STATUS = 0x2000
 
+// States for each of the machines
 var states = [
   {
     id: WASHER,
@@ -52,6 +56,7 @@ var states = [
   }
 ]
 
+// Polling GPIO for cycle time left buttons
 setInterval(function () {
   states.map(function (state) {
     fs.readFile(PATH + '/gpio' + state.pinNo + '/value', function (err, data) {
@@ -68,6 +73,7 @@ setInterval(function () {
   })
 }, 100)
 
+// Volume encoder wheel map
 var encodings = {
    "0101": 1,
    "0100": 2,
@@ -87,6 +93,7 @@ var encodings = {
    "1101": 16
 }
 
+// Polling GPIO for volume encoder wheel
 setInterval(function () {
   var regex = /\n$/
   var pin1 = fs.readFileSync(PATH + '/gpio26/value').toString().replace(regex, '')
@@ -99,11 +106,15 @@ setInterval(function () {
   })
 }, 100)
 
+// Create bus to appliances
 app.bind(adapter, function (bus) {
+  // Listen for subscribes
   bus.on('publish', function (erd) {
+    // A switch for each ERD coming on the subscribe event
     switch (erd.erd) {
       case MACHINE_STATUS:
         var machineStatus = erd.data[0]
+        // For each appliance's, check if it is in a cycle
         for (var state in states) {
           if (erd.source === states[state].id) {
             if (machineStatus === 2) {
@@ -129,6 +140,7 @@ app.bind(adapter, function (bus) {
 
       case SPIN_LEVEL:
         var tempCode = erd.data[0]
+        // For each appliance's, say if the spin level has changed
         for (var state in states) {
           if (erd.source === states[state].id) {
             console.log(states[state].name, states[state].knobTurned)
@@ -141,8 +153,8 @@ app.bind(adapter, function (bus) {
         break
 
       case SOIL_LEVEL:
-        //console.log('Soiled it soiled it')
         var tempCode = erd.data[0]
+        // For each appliance, say if the soil level has changed
         for (var state in states) {
           if (erd.source === states[state].id) {
             console.log(states[state].name, states[state].knobTurned)
@@ -156,6 +168,7 @@ app.bind(adapter, function (bus) {
 
       case WATER_TEMP:
         var tempCode = erd.data[0]
+        // For each appliance, say if the water temperature has changed
         for (var state in states) {
           if (erd.source === states[state].id) {
             console.log(states[state].name, states[state].knobTurned)
@@ -169,6 +182,7 @@ app.bind(adapter, function (bus) {
 
       case TIME_SECS:
         var bytes = erd.data
+        // Time in seconds ERD (Returned by dryer only)
         for (var state in states) {
           if (erd.source === states[state].id) {
             var minutes = Math.round((bytes[0]*255 + bytes[1])/60)
@@ -179,6 +193,7 @@ app.bind(adapter, function (bus) {
 
       case TIME_MINS:
         var timeRemaining = erd.data[1]
+        // Time in minutes ERD (Returned by washer only)
         for (var state in states) {
           if (erd.source === states[state].id) {
             states[state].oldMinutesRemaining = timeRemaining
@@ -188,6 +203,7 @@ app.bind(adapter, function (bus) {
 
       case CYCLE_SELECTED:
         var cycleSelected = erd.data[0]
+        // Say if the cycle selected knob has changed
         for (var state in states) {
           if (erd.source === states[state].id) {
             for (let i in states[state].knobTurned) {
@@ -200,6 +216,7 @@ app.bind(adapter, function (bus) {
         break
 
       case END_CYCLE:
+        // Not used currently
         var cycleEnd = erd.data[0]
         for (var state in states) {
           if (erd.source === states[state].id) {
@@ -208,6 +225,8 @@ app.bind(adapter, function (bus) {
         break
     }
   })
+
+  // Subscribe to all above ERDs
   busSubscribe(bus, SOURCE, TIME_SECS, [DRYER])
   busSubscribe(bus, SOURCE, TIME_MINS, [WASHER])
   busSubscribe(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
