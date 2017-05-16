@@ -87,6 +87,7 @@ var encodings = {
    "1101": 16
 }
 
+// Read Volume Encoder
 setInterval(function () {
   var regex = /\n$/
   var pin1 = fs.readFileSync(PATH + '/gpio26/value').toString().replace(regex, '')
@@ -100,6 +101,7 @@ setInterval(function () {
 }, 100)
 
 app.bind(adapter, function (bus) {
+  // Subscribe event listener
   bus.on('publish', function (erd) {
     switch (erd.erd) {
       case MACHINE_STATUS:
@@ -208,6 +210,8 @@ app.bind(adapter, function (bus) {
         break
     }
   })
+
+  // Subscribe to ERDs
   busSubscribe(bus, SOURCE, TIME_SECS, [DRYER])
   busSubscribe(bus, SOURCE, TIME_MINS, [WASHER])
   busSubscribe(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
