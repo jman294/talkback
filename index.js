@@ -27,6 +27,7 @@ var SPIN_LEVEL = 0x2017
 var SOIL_LEVEL = 0x2015
 var MACHINE_STATUS = 0x2000
 
+// One object to hold state for each appliance
 var states = [
   {
     id: WASHER,
@@ -106,12 +107,13 @@ app.bind(adapter, function (bus) {
     switch (erd.erd) {
       case MACHINE_STATUS:
         var machineStatus = erd.data[0]
+        // For each appliance, check the machine status
         for (var state in states) {
           if (erd.source === states[state].id) {
             if (machineStatus === 2) {
               states[state].inACycle = true
+              // Pressed Start Button
               if (states[state].cycleRunAlert) {
-                // Pressed Start Button
                 states[state].cycleRunAlert = false
                 say.speak(
                     'Starting '
