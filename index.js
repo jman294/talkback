@@ -1,3 +1,6 @@
+const version = '1.0'
+console.log(version)
+
 var loudness = require('loudness')
 var gea = require('gea-sdk')
 var adapter = require('gea-adapter-usb')
