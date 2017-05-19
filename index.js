@@ -12,7 +12,7 @@ var app = gea.configure({
 })
 
 // Path for Raspberry PI GPIO
-var PATH = '/sys/class/gpio'
+var GPIO_PATH = '/sys/class/gpio'
 
 // Washer and Dryer constants
 var SOURCE = 0xcb
@@ -29,6 +29,8 @@ var WATER_TEMP = 0x2016
 var SPIN_LEVEL = 0x2017
 var SOIL_LEVEL = 0x2015
 var MACHINE_STATUS = 0x2000
+var DRY_TEMPERATURE_LEVEL = 0x2019
+var STAIN_PRETREAT = 0xF107
 
 // States for each of the machines
 var states = [
@@ -39,6 +41,7 @@ var states = [
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     buttonPressed: false,
+    // knobTurned has variable for water temperature, spin level, and soil level
     knobTurned: [false, false, false],
     inACycle: false,
     name: 'washer'
@@ -50,6 +53,7 @@ var states = [
     cycleRunAlert: false,
     oldMinutesRemaining: 0,
     buttonPressed: false,
+    // knobTurned has variables for temperature, dryness level, and time
     knobTurned: [false, false, false],
     inACycle: false,
     name: 'dryer'
@@ -57,9 +61,12 @@ var states = [
 ]
 
 // Polling GPIO for cycle time left buttons
-setInterval(function () {
+setInterval(readButtonStates, 100)
+
+
+function readButtonStates () {
   states.map(function (state) {
-    fs.readFile(PATH + '/gpio' + state.pinNo + '/value', function (err, data) {
+    fs.readFile(GPIO_PATH + '/gpio' + state.pinNo + '/value', function (err, data) {
       if (err) throw err
       if (data == 0) {
         if (!state.buttonPressed && state.inACycle) {
@@ -71,7 +78,7 @@ setInterval(function () {
       }
     })
   })
-}, 100)
+}
 
 // Volume encoder wheel map
 var encodings = {
@@ -96,10 +103,10 @@ var encodings = {
 // Polling GPIO for volume encoder wheel
 setInterval(function () {
   var regex = /\n$/
-  var pin1 = fs.readFileSync(PATH + '/gpio26/value').toString().replace(regex, '')
-  var pin2 = fs.readFileSync(PATH + '/gpio13/value').toString().replace(regex, '')
-  var pin3 = fs.readFileSync(PATH + '/gpio6/value').toString().replace(regex, '')
-  var pin4 = fs.readFileSync(PATH + '/gpio27/value').toString().replace(regex, '')
+  var pin1 = fs.readFileSync(GPIO_PATH + '/gpio26/value').toString().replace(regex, '')
+  var pin2 = fs.readFileSync(GPIO_PATH + '/gpio13/value').toString().replace(regex, '')
+  var pin3 = fs.readFileSync(GPIO_PATH + '/gpio6/value').toString().replace(regex, '')
+  var pin4 = fs.readFileSync(GPIO_PATH + '/gpio27/value').toString().replace(regex, '')
   var num = pin1.concat(pin2).concat(pin3).concat(pin4)
   loudness.setVolume(90-encodings[num], function (err) {
      if (err) throw err
@@ -109,6 +116,7 @@ setInterval(function () {
 // Create bus to appliances
 app.bind(adapter, function (bus) {
   // Listen for subscribes
+  let timeSinceLastSubscribe = 0
   bus.on('publish', function (erd) {
     // A switch for each ERD coming on the subscribe event
     switch (erd.erd) {
@@ -138,12 +146,37 @@ app.bind(adapter, function (bus) {
         }
         break
 
+      case DRY_TEMPERATURE_LEVEL:
+        // Smelly
+        setTimeout(function () {
+           var level = erd.data[0]
+           for (var state in states) {
+              if (erd.source === states[state].id) {
+                if (!states[state].knobTurned[0]) {
+                  say.speak('Temperature ' + getTempLevelByCode(level))
+                }
+                states[state].knobTurned[0] = false
+              }
+           }
+        }, 10)
+        break
+
+      case STAIN_PRETREAT:
+        // Not used currently
+        // Will only be returned by washer
+        var stainType = erd.data[0]
+        for (var state in states) {
+          if (erd.source === states[state].id) {
+            say.speak(stainType + '')
+          }
+        }
+        break
+
       case SPIN_LEVEL:
         var tempCode = erd.data[0]
         // For each appliance's, say if the spin level has changed
         for (var state in states) {
           if (erd.source === states[state].id) {
-            console.log(states[state].name, states[state].knobTurned)
             if (!states[state].knobTurned[0]) {
               say.speak('Spin level, '.concat(getSpinLevelByCode(tempCode)))
             }
@@ -157,7 +190,6 @@ app.bind(adapter, function (bus) {
         // For each appliance, say if the soil level has changed
         for (var state in states) {
           if (erd.source === states[state].id) {
-            console.log(states[state].name, states[state].knobTurned)
             if (!states[state].knobTurned[1]) {
               say.speak('Soil level, '.concat(getSoilLevelByCode(tempCode)))
             }
@@ -171,7 +203,6 @@ app.bind(adapter, function (bus) {
         // For each appliance, say if the water temperature has changed
         for (var state in states) {
           if (erd.source === states[state].id) {
-            console.log(states[state].name, states[state].knobTurned)
             if (!states[state].knobTurned[2]) {
               say.speak('Water temperature, '.concat(getTempByCode(tempCode)))
             }
@@ -209,7 +240,9 @@ app.bind(adapter, function (bus) {
             for (let i in states[state].knobTurned) {
               states[state].knobTurned[i] = true
             }
-            say.speak(getReadableCycleName(cycleSelected), 'voice_us2_mbrola')
+            if (cycleSelected != states[state].oldCycle) {
+              say.speak(getReadableCycleName(cycleSelected), 'voice_us2_mbrola')
+            }
             states[state].oldCycle = cycleSelected
           }
         }
@@ -230,10 +263,11 @@ app.bind(adapter, function (bus) {
   busSubscribe(bus, SOURCE, TIME_SECS, [DRYER])
   busSubscribe(bus, SOURCE, TIME_MINS, [WASHER])
   busSubscribe(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
-  busSubscribe(bus, SOURCE, WATER_TEMP, [WASHER, DRYER])
+  busSubscribe(bus, SOURCE, WATER_TEMP, [WASHER])
+  busSubscribe(bus, SOURCE, SOIL_LEVEL, [WASHER])
+  busSubscribe(bus, SOURCE, SPIN_LEVEL, [WASHER])
   busSubscribe(bus, SOURCE, MACHINE_STATUS, [WASHER, DRYER])
-  busSubscribe(bus, SOURCE, SOIL_LEVEL, [WASHER, DRYER])
-  busSubscribe(bus, SOURCE, SPIN_LEVEL, [WASHER, DRYER])
+  busSubscribe(bus, SOURCE, DRY_TEMPERATURE_LEVEL, [DRYER])
 })
 
 function busSubscribe (bus, source, erd, destinations) {
@@ -341,7 +375,6 @@ var getCycleByCode = (function () {
   }
 
   return function (code) {
-    console.log(code)
     return codes[code]
   }
 })()
@@ -350,6 +383,19 @@ var getReadableCycleName = function (code) {
   return getCycleByCode(code)
          .replace(/[_-]/g, ' ')
 }
+
+var getTempLevelByCode = (function () {
+  var codes = {
+     1: 'no heat',
+     2: 'low heat',
+     3: 'medium heat',
+     4: 'high heat'
+  }
+
+  return function (code) {
+     return codes[code]
+  }
+})()
 
 var playCycle = (function () {
   return function (code) {
