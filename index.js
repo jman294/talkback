@@ -27,6 +27,7 @@ var SPIN_LEVEL = 0x2017
 var SOIL_LEVEL = 0x2015
 var MACHINE_STATUS = 0x2000
 
+// One object to hold state for each appliance
 var states = [
   {
     id: WASHER,
@@ -87,6 +88,7 @@ var encodings = {
    "1101": 16
 }
 
+// Read Volume Encoder
 setInterval(function () {
   var regex = /\n$/
   var pin1 = fs.readFileSync(PATH + '/gpio26/value').toString().replace(regex, '')
@@ -100,16 +102,18 @@ setInterval(function () {
 }, 100)
 
 app.bind(adapter, function (bus) {
+  // Subscribe event listener
   bus.on('publish', function (erd) {
     switch (erd.erd) {
       case MACHINE_STATUS:
         var machineStatus = erd.data[0]
+        // For each appliance, check the machine status
         for (var state in states) {
           if (erd.source === states[state].id) {
             if (machineStatus === 2) {
               states[state].inACycle = true
+              // Pressed Start Button
               if (states[state].cycleRunAlert) {
-                // Pressed Start Button
                 states[state].cycleRunAlert = false
                 say.speak(
                     'Starting '
@@ -208,6 +212,8 @@ app.bind(adapter, function (bus) {
         break
     }
   })
+
+  // Subscribe to ERDs
   busSubscribe(bus, SOURCE, TIME_SECS, [DRYER])
   busSubscribe(bus, SOURCE, TIME_MINS, [WASHER])
   busSubscribe(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
