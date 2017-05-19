@@ -1,1 +1,1 @@
-Appliances that talk, capeesh?
+Appliances that talk

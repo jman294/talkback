@@ -35,7 +35,7 @@ var MACHINE_STATUS = 0x2000
 var DRY_TEMPERATURE_LEVEL = 0x2019
 var STAIN_PRETREAT = 0xF107
 
-// States for each of the machines
+// One object to hold state for each appliance
 var states = [
   {
     id: WASHER,
@@ -103,7 +103,7 @@ var encodings = {
    "1101": 16
 }
 
-// Polling GPIO for volume encoder wheel
+// Read Volume Encoder
 setInterval(function () {
   var regex = /\n$/
   var pin1 = fs.readFileSync(GPIO_PATH + '/gpio26/value').toString().replace(regex, '')
@@ -118,20 +118,20 @@ setInterval(function () {
 
 // Create bus to appliances
 app.bind(adapter, function (bus) {
-  // Listen for subscribes
   let timeSinceLastSubscribe = 0
+  // Subscribe event listener
   bus.on('publish', function (erd) {
     // A switch for each ERD coming on the subscribe event
     switch (erd.erd) {
       case MACHINE_STATUS:
         var machineStatus = erd.data[0]
-        // For each appliance's, check if it is in a cycle
+        // For each appliance, check the machine status
         for (var state in states) {
           if (erd.source === states[state].id) {
             if (machineStatus === 2) {
               states[state].inACycle = true
+              // Pressed Start Button
               if (states[state].cycleRunAlert) {
-                // Pressed Start Button
                 states[state].cycleRunAlert = false
                 say.speak(
                     'Starting '
@@ -262,7 +262,7 @@ app.bind(adapter, function (bus) {
     }
   })
 
-  // Subscribe to all above ERDs
+  // Subscribe to ERDs
   busSubscribe(bus, SOURCE, TIME_SECS, [DRYER])
   busSubscribe(bus, SOURCE, TIME_MINS, [WASHER])
   busSubscribe(bus, SOURCE, CYCLE_SELECTED, [WASHER, DRYER])
