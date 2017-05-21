@@ -1,7 +1,10 @@
 const assert = require('assert')
+const appliance = require('../modules/appliance')
 const eventbuffer = require('../modules/eventbuffer')
+const erds = require('../modules/erds')
+const talkback = require('../modules/talkback')
 
-describe('Buffer', function () {
+describe('buffer', function () {
   it('should handle one value added', function (done) {
     let buffer = eventbuffer()
     let expectedOutPut = ['farts']
@@ -56,5 +59,30 @@ describe('Buffer', function () {
       buffer.add('matter')
       buffer.add('matter')
     }, 50)
+  })
+})
+describe('erds', function () {
+  it('should return correct object for erd address', function () {
+    let erd = erds.erd(0x2007)
+    assert.ok(erd.priority && erd.data)
+  })
+  it('should throw error for invalid input', function () {
+    assert.throws(function () {
+      erds.erd('a gibberish value')
+    },
+    function (err) {
+      return err instanceof Error
+    })
+  })
+})
+describe('appliance', function () {
+  it('should contain buffer', function () {
+    let testAppliance = appliance()
+    assert.ok(testAppliance.buffer !== undefined)
+  })
+})
+describe('talkback', function () {
+  it('should contain start function', function () {
+    assert.ok(talkback.start !== undefined)
   })
 })
