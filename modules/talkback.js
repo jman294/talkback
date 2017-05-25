@@ -21,6 +21,7 @@ const talkback = (function () {
     buffer: eventbuffer(),
     oldCycle: 0,
     pinNo: 4,
+    timeInMins: 'unknown',
     name: 'washer',
   },
   {
@@ -28,6 +29,7 @@ const talkback = (function () {
     buffer: eventbuffer(),
     oldCycle: 0,
     pinNo: 17,
+    timeInMins: 'unknown',
     name: 'dryer'
   }
   ]
@@ -50,6 +52,7 @@ const talkback = (function () {
       busSubscribe(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
+      //busSubscribe(bus, SOURCE, erds.STAIN_PRETREAT, [appliances[0]])
     })
 
     appliances.map(function (appliance) {
@@ -162,7 +165,7 @@ const talkback = (function () {
               'Starting '
               .concat(appliance.oldCycle)
               .concat(', with an estimated ')
-              //.concat(states[state].oldMinutesRemaining)
+              .concat(appliance.timeInMins)
               .concat(' minutes left.')
               )
         }
