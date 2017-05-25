@@ -64,7 +64,7 @@ describe('buffer', function () {
 describe('erds', function () {
   it('should return correct object for erd address', function () {
     let erd = erds.erd(0x2007)
-    assert.ok(erd.priority && erd.data)
+    assert.ok(Array.isArray(erd.causes) && erd.data)
   })
   it('should throw error for invalid input', function () {
     assert.throws(function () {

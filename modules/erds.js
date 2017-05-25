@@ -8,52 +8,66 @@ const erds = (function () {
   const SPIN_LEVEL = 0x2017
   const SOIL_LEVEL = 0x2015
   const MACHINE_STATUS = 0x2000
+  const DRY_TEMP = 0x2019
+  const STAIN_PRETREAT = 0xF107
 
   const erdList = {
     [TIME_SECS]: {
-      priority: true,
+      causes: [],
       data: function (erd) {
         return (erd.data[0]*255 + erd.data[1])/60
       }
     },
     [TIME_MINS]: {
-      priority: true,
+      causes: [],
       data: function (erd) {
         return erd.data[1]
       }
     },
     [CYCLE_SELECTED]: {
-      priority: true,
+      causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL, DRY_TEMP],
       data: function (erd) {
         return erd.data[0]
       }
     },
     [END_CYCLE]: {
-      priority: true,
+      causes: [],
       data: function (erd) {
         return erd.data[0]
       }
     },
     [WATER_TEMP]: {
-      priority: false,
+      causes: [TIME_MINS],
       data: function (erd) {
         return erd.data[0]
       }
     },
     [SPIN_LEVEL]: {
-      priority: false,
+      causes: [TIME_MINS],
       data: function (erd) {
         return erd.data[0]
       }
     },
     [SOIL_LEVEL]: {
-      priority: false,
+      causes: [TIME_MINS],
       data: function (erd) {
         return erd.data[0]
       }
     },
     [MACHINE_STATUS]: {
-      priority: true,
+      causes: [],
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [DRY_TEMP]: {
+      causes: [],
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [STAIN_PRETREAT]: {
+      causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL],
       data: function (erd) {
         return erd.data[0]
       }

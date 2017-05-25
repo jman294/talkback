@@ -35,6 +35,9 @@ const talkback = (function () {
   function start () {
     app.bind(adapter, function (bus) {
       bus.on('publish', function (erd) {
+        if (erd.erd === erds.DRY_TEMP) {
+          console.log('dry temp')
+        }
         appliances.map(function (appliance) {
           if (appliance.id === erd.source) {
             appliance.buffer.add(erd)
@@ -49,6 +52,8 @@ const talkback = (function () {
       busSubscribe(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
+      busSubscribe(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
+      //busSubscribe(bus, SOURCE, erds.STAIN_PRETREAT, [appliances[0]])
     })
 
     appliances.map(function (appliance) {
@@ -77,11 +82,7 @@ const talkback = (function () {
   }
 
   function handleMultipleEvents (events, appliance) {
-    events.map(function (event) {
-      if (erds.erd(event.erd).priority) {
-        handleSingleEvent(event, appliance)
-      }
-    })
+    console.log(events)
   }
 
   function handleSingleEvent (event, appliance) {
@@ -107,6 +108,12 @@ const talkback = (function () {
       case erds.MACHINE_STATUS:
         handleMachineStatus(event, appliance)
         break
+      case erds.DRY_TEMP:
+        handleDryTemp(event, appliance)
+        break
+      case erds.STAIN_PRETREAT:
+        handleStainPretreat(event, appliance)
+        break
     }
   }
 
@@ -121,25 +128,24 @@ const talkback = (function () {
   function handleCycleSelected (event, appliance) {
     let newCycle = erds.erd(erds.CYCLE_SELECTED).data(event)
     if (newCycle !== appliance.oldCycle) {
-      console.log(newCycle)
-      say.speak(newCycle, 'voice_us2_mbrola')
+      console.log('cycle: '+newCycle)
     }
     appliance.oldCycle = newCycle
   }
 
   function handleWaterTemp (event, appliance) {
     let waterTemp = erds.erd(erds.WATER_TEMP).data(event)
-    console.log(waterTemp)
+    console.log('water temp: '+waterTemp)
   }
 
   function handleSpinLevel (event, appliance) {
     let spinLevel = erds.erd(erds.SPIN_LEVEL).data(event)
-    console.log(spinLevel)
+    console.log('spin level: '+spinLevel)
   }
 
   function handleSoilLevel (event, appliance) {
     let soilLevel = erds.erd(erds.SPIN_LEVEL).data(event)
-    console.log(soilLevel)
+    console.log('soil level: '+soilLevel)
   }
 
   function handleMachineStatus (event, appliance) {
@@ -160,6 +166,16 @@ const talkback = (function () {
         appliance.startButton = true
         appliance.inACycle = false
       }
+  }
+
+  function handleDryTemp (event, appliances) {
+    let temp = erds.erd(erds.DRY_TEMP).data(event)
+    console.log('dry temp: '+temp)
+  }
+
+  function handleStainPretreat (event, appliance) {
+    let level = erds.erd(erds.STAIN_PRETREAT).data(event)
+    console.log('stain pretreat: '+level)
   }
 
   return {
