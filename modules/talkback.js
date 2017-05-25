@@ -35,9 +35,6 @@ const talkback = (function () {
   function start () {
     app.bind(adapter, function (bus) {
       bus.on('publish', function (erd) {
-        if (erd.erd === erds.DRY_TEMP) {
-          console.log('dry temp')
-        }
         appliances.map(function (appliance) {
           if (appliance.id === erd.source) {
             appliance.buffer.add(erd)
@@ -45,6 +42,7 @@ const talkback = (function () {
         })
       })
 
+      busSubscribe(bus, SOURCE, erds.DRY_TEMP, appliances)
       busSubscribe(bus, SOURCE, erds.TIME_SECS, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.TIME_MINS, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, appliances)
@@ -52,8 +50,6 @@ const talkback = (function () {
       busSubscribe(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
-      busSubscribe(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
-      //busSubscribe(bus, SOURCE, erds.STAIN_PRETREAT, [appliances[0]])
     })
 
     appliances.map(function (appliance) {
@@ -82,7 +78,15 @@ const talkback = (function () {
   }
 
   function handleMultipleEvents (events, appliance) {
-    console.log(events)
+    let ignored = []
+    events.map(function (event) {
+      ignored = ignored.concat(erds.erd(event.erd).causes)
+    })
+    events.map(function (event) {
+      if (!ignored.includes(event.erd)) {
+        handleSingleEvent(event, appliance)
+      }
+    })
   }
 
   function handleSingleEvent (event, appliance) {

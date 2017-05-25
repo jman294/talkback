@@ -14,60 +14,70 @@ const erds = (function () {
   const erdList = {
     [TIME_SECS]: {
       causes: [],
+      alwaysRun: true,
       data: function (erd) {
         return (erd.data[0]*255 + erd.data[1])/60
       }
     },
     [TIME_MINS]: {
       causes: [],
+      alwaysRun: true,
       data: function (erd) {
         return erd.data[1]
       }
     },
     [CYCLE_SELECTED]: {
       causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL, DRY_TEMP],
+      alwaysRun: true,
       data: function (erd) {
         return erd.data[0]
       }
     },
     [END_CYCLE]: {
       causes: [],
+      alwaysRun: true,
       data: function (erd) {
         return erd.data[0]
       }
     },
     [WATER_TEMP]: {
-      causes: [TIME_MINS],
+      causes: [],
+      alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
       }
     },
     [SPIN_LEVEL]: {
-      causes: [TIME_MINS],
+      causes: [],
+      alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
       }
     },
     [SOIL_LEVEL]: {
-      causes: [TIME_MINS],
+      causes: [],
+      alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
       }
     },
     [MACHINE_STATUS]: {
       causes: [],
+      alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
       }
     },
     [DRY_TEMP]: {
       causes: [],
+      alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
       }
     },
     [STAIN_PRETREAT]: {
       causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL],
+      alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
       }
@@ -91,7 +101,8 @@ const erds = (function () {
     WATER_TEMP,
     SPIN_LEVEL,
     SOIL_LEVEL,
-    MACHINE_STATUS
+    MACHINE_STATUS,
+    DRY_TEMP
   }
 
 })()
