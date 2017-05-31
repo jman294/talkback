@@ -102,6 +102,7 @@ const erds = (function () {
     SPIN_LEVEL,
     SOIL_LEVEL,
     MACHINE_STATUS,
+    STAIN_PRETREAT,
     DRY_TEMP
   }
 

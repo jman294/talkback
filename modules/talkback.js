@@ -52,7 +52,7 @@ const talkback = (function () {
       busSubscribe(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
-      //busSubscribe(bus, SOURCE, erds.STAIN_PRETREAT, [appliances[0]])
+      busSubscribe(bus, SOURCE, erds.STAIN_PRETREAT, [appliances[0]])
     })
 
     appliances.map(function (appliance) {
