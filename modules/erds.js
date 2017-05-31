@@ -27,7 +27,7 @@ const erds = (function () {
       }
     },
     [CYCLE_SELECTED]: {
-      causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL, DRY_TEMP],
+      causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL, DRY_TEMP, STAIN_PRETREAT],
       alwaysRun: true,
       data: function (erd) {
         return erd.data[0]

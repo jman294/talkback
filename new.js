@@ -2,6 +2,7 @@ const loudness = require('loudness')
 const talkback = require('./modules/talkback')
 talkback.start()
 
+// Only works on Raspberry Pi
 if (false) {
 setInterval(function () {
   talkback.appliances.map(function (appliance) {
