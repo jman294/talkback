@@ -45,6 +45,7 @@ const talkback = (function () {
         })
       })
 
+      busSubscribe(bus, SOURCE, erds.DEEP_FILL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.DRY_TEMP, appliances)
@@ -123,6 +124,9 @@ const talkback = (function () {
       case erds.STAIN_PRETREAT:
         handleStainPretreat(event, appliance)
         break
+      case erds.DEEP_FILL:
+        handleDeepFill(event, appliance)
+        break
     }
   }
 
@@ -185,6 +189,11 @@ const talkback = (function () {
   function handleStainPretreat (event, appliance) {
     let level = erds.erd(erds.STAIN_PRETREAT).data(event)
     say.speak('stain pretreat: '+enums.stainPretreat[level], 'voice_us2_mbrola')
+  }
+
+  function handleDeepFill (event, appliance) {
+    let state = erds.erd(erds.DEEP_FILL).data(event)
+    say.speak('deep fill: '+enums.deepFill[state])
   }
 
   return {

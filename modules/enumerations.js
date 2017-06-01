@@ -81,6 +81,11 @@ const enumerations = (function () {
     5: 'dirt'
   }
 
+  const deepFill = {
+    0: 'off',
+    1: ''
+  }
+
   function makeReadable (text) {
     return text.replace(/[_-]/g, ' ')
   }
@@ -92,6 +97,7 @@ const enumerations = (function () {
     cycle,
     dryTemp,
     stainPretreat,
+    deepFill,
     makeReadable
   }
 })()

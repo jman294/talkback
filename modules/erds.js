@@ -10,6 +10,7 @@ const erds = (function () {
   const MACHINE_STATUS = 0x2000
   const DRY_TEMP = 0x2019
   const STAIN_PRETREAT = 0xF107
+  const DEEP_FILL = 0xF123
 
   const erdList = {
     [TIME_SECS]: {
@@ -81,6 +82,13 @@ const erds = (function () {
       data: function (erd) {
         return erd.data[0]
       }
+    },
+    [DEEP_FILL]: {
+      causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
     }
   }
 
@@ -103,7 +111,8 @@ const erds = (function () {
     SOIL_LEVEL,
     MACHINE_STATUS,
     STAIN_PRETREAT,
-    DRY_TEMP
+    DRY_TEMP,
+    DEEP_FILL
   }
 
 })()
