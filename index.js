@@ -3,13 +3,16 @@ console.log('talkback version '+version)
 
 const loudness = require('loudness')
 const talkback = require('./modules/talkback')
+const fs = require('fs')
+const say = require('say')
 talkback.start()
 
 // Only works on Raspberry Pi
-if (false) {
+if (true) {
+const GPIO_PATH = '/sys/class/gpio'
 setInterval(function () {
   talkback.appliances.map(function (appliance) {
-    fs.readFile(PATH + '/gpio' + appliance.pinNo + '/value', function (err, data) {
+    fs.readFile(GPIO_PATH + '/gpio' + appliance.pinNo + '/value', function (err, data) {
       if (err) throw err
       if (data == 0) {
         if (!appliance.buttonPressed && appliance.inACycle) {

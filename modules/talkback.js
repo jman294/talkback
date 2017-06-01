@@ -165,7 +165,7 @@ const talkback = (function () {
           appliance.startButton = false
           say.speak(
               'Starting '
-              .concat(appliance.oldCycle)
+              .concat(enums.cycle[appliance.oldCycle])
               .concat(', with an estimated ')
               .concat(appliance.timeInMins)
               .concat(' minutes left.')
