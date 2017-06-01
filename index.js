@@ -18,8 +18,9 @@ setInterval(function () {
       }
     })
   })
-}, 100)
+}
 
+// Volume encoder wheel map
 var encodings = {
    "0101": 1,
    "0100": 2,
@@ -42,10 +43,10 @@ var encodings = {
 // Read Volume Encoder
 setInterval(function () {
   var regex = /\n$/
-  var pin1 = fs.readFileSync(PATH + '/gpio26/value').toString().replace(regex, '')
-  var pin2 = fs.readFileSync(PATH + '/gpio13/value').toString().replace(regex, '')
-  var pin3 = fs.readFileSync(PATH + '/gpio6/value').toString().replace(regex, '')
-  var pin4 = fs.readFileSync(PATH + '/gpio27/value').toString().replace(regex, '')
+  var pin1 = fs.readFileSync(GPIO_PATH + '/gpio26/value').toString().replace(regex, '')
+  var pin2 = fs.readFileSync(GPIO_PATH + '/gpio13/value').toString().replace(regex, '')
+  var pin3 = fs.readFileSync(GPIO_PATH + '/gpio6/value').toString().replace(regex, '')
+  var pin4 = fs.readFileSync(GPIO_PATH + '/gpio27/value').toString().replace(regex, '')
   var num = pin1.concat(pin2).concat(pin3).concat(pin4)
   loudness.setVolume(90-encodings[num], function (err) {
      if (err) throw err
