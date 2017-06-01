@@ -38,7 +38,6 @@ const talkback = (function () {
   function start () {
     app.bind(adapter, function (bus) {
       bus.on('publish', function (erd) {
-        console.log(erd)
         appliances.map(function (appliance) {
           if (appliance.id === erd.source) {
             appliance.buffer.add(erd)

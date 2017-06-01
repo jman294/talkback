@@ -1,3 +1,6 @@
+const version = 2.0
+console.log('talkback version '+version)
+
 const loudness = require('loudness')
 const talkback = require('./modules/talkback')
 talkback.start()
@@ -18,7 +21,7 @@ setInterval(function () {
       }
     })
   })
-}
+})
 
 // Volume encoder wheel map
 var encodings = {
