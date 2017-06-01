@@ -8,7 +8,8 @@ const say = require('say')
 talkback.start()
 
 // Only works on Raspberry Pi
-if (true) {
+fs.readFile('/proc/cpuinfo', function (data) {
+  if (data.toString().indexOf('BCM2708') !== -1) {
 const GPIO_PATH = '/sys/class/gpio'
 setInterval(function () {
   talkback.appliances.map(function (appliance) {
@@ -59,3 +60,4 @@ setInterval(function () {
   })
 }, 100)
 }
+})
