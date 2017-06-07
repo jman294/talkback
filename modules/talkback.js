@@ -141,24 +141,24 @@ const talkback = (function () {
   function handleCycleSelected (event, appliance) {
     let newCycle = erds.erd(erds.CYCLE_SELECTED).data(event)
     if (newCycle !== appliance.oldCycle) {
-      say.speak(enums.makeReadable(enums.cycle[newCycle]), 'voice_us2_mbrola')
+      say.speak(enums.makeReadable(enums[lang].cycle[newCycle]), 'voice_us2_mbrola')
     }
     appliance.oldCycle = newCycle
   }
 
   function handleWaterTemp (event, appliance) {
     let waterTemp = erds.erd(erds.WATER_TEMP).data(event)
-    say.speak('water temp: '+enums.waterTemp[waterTemp], 'voice_us2_mbrola')
+    say.speak('water temp: '+enums[lang].waterTemp[waterTemp], 'voice_us2_mbrola')
   }
 
   function handleSpinLevel (event, appliance) {
     let spinLevel = erds.erd(erds.SPIN_LEVEL).data(event)
-    say.speak('spin level: '+enums.spinLevel[spinLevel], 'voice_us2_mbrola')
+    say.speak('spin level: '+enums[lang].spinLevel[spinLevel], 'voice_us2_mbrola')
   }
 
   function handleSoilLevel (event, appliance) {
     let soilLevel = erds.erd(erds.SPIN_LEVEL).data(event)
-    say.speak('soil level: '+enums.soilLevel[soilLevel], 'voice_us2_mbrola')
+    say.speak('soil level: '+enums[lang].soilLevel[soilLevel], 'voice_us2_mbrola')
   }
 
   function handleMachineStatus (event, appliance) {
@@ -169,7 +169,7 @@ const talkback = (function () {
           appliance.startButton = false
           say.speak(
               'Starting '
-              .concat(enums.makeReadable(enums.cycle[appliance.oldCycle]))
+              .concat(enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
               .concat(', with an estimated ')
               .concat(appliance.timeInMins)
               .concat(' minutes left.')
@@ -183,17 +183,17 @@ const talkback = (function () {
 
   function handleDryTemp (event, appliances) {
     let temp = erds.erd(erds.DRY_TEMP).data(event)
-    say.speak('dry temp: '+enums.dryTemp[temp], 'voice_us2_mbrola')
+    say.speak('dry temp: '+enums[lang].dryTemp[temp], 'voice_us2_mbrola')
   }
 
   function handleStainPretreat (event, appliance) {
     let level = erds.erd(erds.STAIN_PRETREAT).data(event)
-    say.speak('stain pretreat: '+enums.stainPretreat[level], 'voice_us2_mbrola')
+    say.speak('stain pretreat: '+enums[lang].stainPretreat[level], 'voice_us2_mbrola')
   }
 
   function handleDeepFill (event, appliance) {
     let state = erds.erd(erds.DEEP_FILL).data(event)
-    say.speak('deep fill: '+enums.deepFill[state])
+    say.speak('deep fill: '+enums[lang].deepFill[state])
   }
 
   return {

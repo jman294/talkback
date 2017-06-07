@@ -3,6 +3,7 @@ const appliance = require('../modules/appliance')
 const eventbuffer = require('../modules/eventbuffer')
 const erds = require('../modules/erds')
 const talkback = require('../modules/talkback')
+const enums = require('../modules/enumerations')
 
 describe('buffer', function () {
   it('should handle one value added', function (done) {
@@ -84,5 +85,13 @@ describe('appliance', function () {
 describe('talkback', function () {
   it('should contain start function', function () {
     assert.ok(talkback.start !== undefined)
+  })
+})
+describe('enumerations', function () {
+  it('should contain english set of enumerations', function () {
+    assert.ok(enums.en !== undefined)
+  })
+  it('should contain english cycle enumeration', function () {
+    assert.ok(enums.en.cycle !== undefined)
   })
 })
