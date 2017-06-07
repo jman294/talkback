@@ -5,8 +5,6 @@ const eventbuffer = require('./eventbuffer')
 const erds = require('./erds')
 const enums = require('./enumerations')
 
-say.speak = console.log
-
 const talkback = (function () {
   let lang = 'en'
   const app = gea.configure({
