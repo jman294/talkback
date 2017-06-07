@@ -5,6 +5,7 @@ const erds = require('../modules/erds')
 const talkback = require('../modules/talkback')
 const enums = require('../modules/enumerations')
 const messages = require('../modules/messages')
+const tts = require('../modules/tts')
 
 describe('buffer', function () {
   it('should handle one value added', function (done) {
@@ -99,5 +100,13 @@ describe('enumerations', function () {
 describe('messages', function () {
   it('should contain messages based on erd and language', function () {
     assert.ok(messages.en[erds.CYCLE_SELECTED] !== undefined)
+  })
+})
+describe('tts', function () {
+  it('should contain speak function', function (done) {
+    assert.ok(tts.speak != undefined)
+    tts.speak('Hello World', 'en-us', function () {
+      done()
+    })
   })
 })
