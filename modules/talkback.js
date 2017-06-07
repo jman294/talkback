@@ -4,6 +4,7 @@ const say = require('say')
 const eventbuffer = require('./eventbuffer')
 const erds = require('./erds')
 const enums = require('./enumerations')
+const messages = require('./messages')
 
 const talkback = (function () {
   let lang = 'en'
@@ -149,17 +150,20 @@ const talkback = (function () {
 
   function handleWaterTemp (event, appliance) {
     let waterTemp = erds.erd(erds.WATER_TEMP).data(event)
-    say.speak('water temp: '+enums[lang].waterTemp[waterTemp], 'voice_us2_mbrola')
+    say.speak(messages[lang][erds.WATER_TEMP]
+              .replace('%1', enums[lang].waterTemp[waterTemp], 'voice_us2_mbrola'))
   }
 
   function handleSpinLevel (event, appliance) {
     let spinLevel = erds.erd(erds.SPIN_LEVEL).data(event)
-    say.speak('spin level: '+enums[lang].spinLevel[spinLevel], 'voice_us2_mbrola')
+    say.speak(messages[lang][erds.SPIN_LEVEL]
+              .replace('%1', enums[lang].spinLevel[spinLevel], 'voice_us2_mbrola'))
   }
 
   function handleSoilLevel (event, appliance) {
-    let soilLevel = erds.erd(erds.SPIN_LEVEL).data(event)
-    say.speak('soil level: '+enums[lang].soilLevel[soilLevel], 'voice_us2_mbrola')
+    let soilLevel = erds.erd(erds.SOIL_LEVEL).data(event)
+    say.speak(messages[lang][erds.SOIL_LEVEL]
+              .replace('%1', enums[lang].soilLevel[soilLevel], 'voice_us2_mbrola'))
   }
 
   function handleMachineStatus (event, appliance) {
@@ -169,12 +173,11 @@ const talkback = (function () {
         if (appliance.startButton) {
           appliance.startButton = false
           say.speak(
-              'Starting '
-              .concat(enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
-              .concat(', with an estimated ')
-              .concat(appliance.timeInMins)
-              .concat(' minutes left.')
-              , 'voice_us2_mbrola')
+              messages[lang][erds.MACHINE_STATUS]
+              .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
+              .replace('%2', appliance.timeInMins)
+              , 'voice_us2_mbrola'
+          )
         }
       } else {
         appliance.startButton = true
@@ -184,17 +187,20 @@ const talkback = (function () {
 
   function handleDryTemp (event, appliances) {
     let temp = erds.erd(erds.DRY_TEMP).data(event)
-    say.speak('dry temp: '+enums[lang].dryTemp[temp], 'voice_us2_mbrola')
+    say.speak(messages[lang][erds.DRY_TEMP]
+              .replace('%1', enums[lang].dryTemp[temp], 'voice_us2_mbrola'))
   }
 
   function handleStainPretreat (event, appliance) {
     let level = erds.erd(erds.STAIN_PRETREAT).data(event)
-    say.speak('stain pretreat: '+enums[lang].stainPretreat[level], 'voice_us2_mbrola')
+    say.speak(messages[lang][erds.STAIN_PRETREAT]
+              .replace('%1', enums[lang].stainPretreat[level], 'voice_us2_mbrola'))
   }
 
   function handleDeepFill (event, appliance) {
     let state = erds.erd(erds.DEEP_FILL).data(event)
-    say.speak('deep fill: '+enums[lang].deepFill[state])
+    say.speak(messages[lang][erds.DEEP_FILL]
+              .replace('%1', enums[lang].deepFill[state]))
   }
 
   return {

@@ -4,6 +4,7 @@ const eventbuffer = require('../modules/eventbuffer')
 const erds = require('../modules/erds')
 const talkback = require('../modules/talkback')
 const enums = require('../modules/enumerations')
+const messages = require('../modules/messages')
 
 describe('buffer', function () {
   it('should handle one value added', function (done) {
@@ -93,5 +94,10 @@ describe('enumerations', function () {
   })
   it('should contain english cycle enumeration', function () {
     assert.ok(enums.en.cycle !== undefined)
+  })
+})
+describe('messages', function () {
+  it('should contain messages based on erd and language', function () {
+    assert.ok(messages.en[erds.CYCLE_SELECTED] !== undefined)
   })
 })
