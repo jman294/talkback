@@ -11,8 +11,19 @@ const messages = (function () {
     [erds.DEEP_FILL]: 'deep fill: %1'
   }
 
+  const es = {
+    [erds.WATER_TEMP]: 'temp del agua: %1',
+    [erds.SPIN_LEVEL]: 'nivel de giro: %1',
+    [erds.SOIL_LEVEL]: 'nivel del suelo: %1',
+    [erds.MACHINE_STATUS]: 'Comenzando %1, con una estimacion %2 minutos restante.',
+    [erds.DRY_TEMP]: 'temp seca: %1',
+    [erds.STAIN_PRETREAT]: 'mancha pretratamiento: %1',
+    [erds.DEEP_FILL]: 'relleno profundo: %1'
+  }
+
   return {
-    en
+    en,
+    es
   }
 })()
 

@@ -96,10 +96,17 @@ describe('enumerations', function () {
   it('should contain english cycle enumeration', function () {
     assert.ok(enums.en.cycle !== undefined)
   })
+  it('should contain spanish set of enumerations', function () {
+    assert.ok(enums.es !== undefined)
+  })
+  it('should contain spanish cycle enumeration', function () {
+    assert.ok(enums.es.cycle !== undefined)
+  })
 })
 describe('messages', function () {
   it('should contain messages based on erd and language', function () {
-    assert.ok(messages.en[erds.CYCLE_SELECTED] !== undefined)
+    assert.ok(messages.en[erds.DEEP_FILL])
+    assert.ok(messages.es[erds.DEEP_FILL])
   })
 })
 describe('tts', function () {
