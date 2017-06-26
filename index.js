@@ -59,11 +59,11 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
         if (err) throw err
       })
     }, 100)
+    setInterval(function() {
+      var pin = fs.readFileSync(GPIO_PATH + '/gpio22/value').toString().replace(/\n$/, '')
+      var langs = ['en', 'es']
+      talkback.lang = langs[(langs.indexOf(talkback.lang) + 1) % langs.length]
+    }, 100)
   }
 
-  setInterval(function() {
-    var pin = fs.readFileSync(GPIO_PATH + '/gpio22/value').toString().replace(/\n$/, '')
-    var langs = ['en', 'es']
-    talkback.lang = langs[(langs.indexOf(talkback.lang) + 1) % langs.length]
-  }, 100)
 })
