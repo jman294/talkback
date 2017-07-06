@@ -8,7 +8,8 @@ const messages = (function () {
     [erds.MACHINE_STATUS]: 'Starting %1, with an estimated %2 minutes left.',
     [erds.DRY_TEMP]: 'dry temp: %1',
     [erds.STAIN_PRETREAT]: 'stain pretreat: %1',
-    [erds.DEEP_FILL]: 'deep fill: %1'
+    [erds.DEEP_FILL]: 'deep fill: %1',
+    timeLeft: 'About %1 minutes left on the %2.'
   }
 
   const es = {
@@ -18,7 +19,8 @@ const messages = (function () {
     [erds.MACHINE_STATUS]: 'Comenzando %1, con una estimacion %2 minutos restante.',
     [erds.DRY_TEMP]: 'temp seca: %1',
     [erds.STAIN_PRETREAT]: 'mancha pretratamiento: %1',
-    [erds.DEEP_FILL]: 'relleno profundo: %1'
+    [erds.DEEP_FILL]: 'relleno profundo: %1',
+    timeLeft: 'About %1 minutes left on the %2.'
   }
 
   return {

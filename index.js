@@ -5,6 +5,8 @@ const loudness = require('loudness')
 const talkback = require('./modules/talkback')
 const fs = require('fs')
 const say = require('say')
+const tts = require('./modules/tts')
+const messages = require('./modules/messages')
 talkback.start()
 
 // Only works on Raspberry Pi
@@ -17,7 +19,10 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
           if (err) throw err
           if (data == 0) {
             if (!appliance.buttonPressed && appliance.inACycle) {
-              say.speak('About '.concat(appliance.timeInMins).concat(' minutes left on the ').concat(appliance.name), 'voice_us2_mbrola')
+              //tts.speak('About '.concat(appliance.timeInMins).concat(' minutes left on the ').concat(appliance.name), talkback.lang)
+              console.log(talkback.lang)
+              tts.speak(messages[talkback.lang]["timeLeft"].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
+              //say.speak('About '.concat(appliance.timeInMins).concat(' minutes left on the ').concat(appliance.name), 'voice_us2_mbrola')
             }
             appliance.buttonPressed = true
           } else {

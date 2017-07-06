@@ -8,7 +8,7 @@ const messages = require('./messages')
 const tts = require('./tts')
 
 const talkback = (function () {
-  let lang = 'en'
+  let lang = 'es'
   const app = gea.configure({
     address: 0xCB,
     version: [0, 0, 1, 0]
@@ -144,7 +144,7 @@ const talkback = (function () {
   function handleCycleSelected (event, appliance) {
     let newCycle = erds.erd(erds.CYCLE_SELECTED).data(event)
     if (newCycle !== appliance.oldCycle) {
-      tts.speak(enums.makeReadable(enums[lang].cycle[newCycle]), 'en-US')
+      tts.speak(enums.makeReadable(enums[lang].cycle[newCycle]), lang)
     }
     appliance.oldCycle = newCycle
   }
@@ -152,19 +152,19 @@ const talkback = (function () {
   function handleWaterTemp (event, appliance) {
     let waterTemp = erds.erd(erds.WATER_TEMP).data(event)
     tts.speak(messages[lang][erds.WATER_TEMP]
-              .replace('%1', enums[lang].waterTemp[waterTemp]), 'en-US')
+              .replace('%1', enums[lang].waterTemp[waterTemp]), lang)
   }
 
   function handleSpinLevel (event, appliance) {
     let spinLevel = erds.erd(erds.SPIN_LEVEL).data(event)
     tts.speak(messages[lang][erds.SPIN_LEVEL]
-              .replace('%1', enums[lang].spinLevel[spinLevel]), 'en-US')
+              .replace('%1', enums[lang].spinLevel[spinLevel]), lang)
   }
 
   function handleSoilLevel (event, appliance) {
     let soilLevel = erds.erd(erds.SOIL_LEVEL).data(event)
     tts.speak(messages[lang][erds.SOIL_LEVEL]
-              .replace('%1', enums[lang].soilLevel[soilLevel]), 'en-US')
+              .replace('%1', enums[lang].soilLevel[soilLevel]), lang)
   }
 
   function handleMachineStatus (event, appliance) {
@@ -177,7 +177,7 @@ const talkback = (function () {
               messages[lang][erds.MACHINE_STATUS]
               .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
               .replace('%2', appliance.timeInMins)
-              , 'en-US'
+              , lang
           )
         }
       } else {
@@ -189,23 +189,24 @@ const talkback = (function () {
   function handleDryTemp (event, appliances) {
     let temp = erds.erd(erds.DRY_TEMP).data(event)
     tts.speak(messages[lang][erds.DRY_TEMP]
-              .replace('%1', enums[lang].dryTemp[temp]), 'en-US')
+              .replace('%1', enums[lang].dryTemp[temp]), lang)
   }
 
   function handleStainPretreat (event, appliance) {
     let level = erds.erd(erds.STAIN_PRETREAT).data(event)
     tts.speak(messages[lang][erds.STAIN_PRETREAT]
-              .replace('%1', enums[lang].stainPretreat[level]), 'en-US')
+              .replace('%1', enums[lang].stainPretreat[level]), lang)
   }
 
   function handleDeepFill (event, appliance) {
     let state = erds.erd(erds.DEEP_FILL).data(event)
     tts.speak(messages[lang][erds.DEEP_FILL]
-              .replace('%1', enums[lang].deepFill[state]), 'en-US')
+              .replace('%1', enums[lang].deepFill[state]), lang)
   }
 
   return {
     start,
+    lang,
     appliances
   }
 

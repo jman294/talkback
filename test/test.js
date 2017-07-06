@@ -112,7 +112,7 @@ describe('messages', function () {
 describe('tts', function () {
   it('should contain speak function', function (done) {
     assert.ok(tts.speak != undefined)
-    tts.speak('Hello World', 'en-us', function () {
+    tts.speak('Hello World', 'en', function () {
       done()
     })
   })
