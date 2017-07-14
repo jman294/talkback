@@ -6,6 +6,8 @@ const talkback = require('./modules/talkback')
 const fs = require('fs')
 const say = require('say')
 const tts = require('./modules/tts')
+const erds = require('./modules/erds')
+const enums = require('./modules/enumerations')
 const messages = require('./modules/messages')
 talkback.start()
 
@@ -18,11 +20,15 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
         fs.readFile(GPIO_PATH + '/gpio' + appliance.pinNo + '/value', function(err, data) {
           if (err) throw err
           if (data == 0) {
-            if (!appliance.buttonPressed && appliance.inACycle) {
-              //tts.speak('About '.concat(appliance.timeInMins).concat(' minutes left on the ').concat(appliance.name), talkback.lang)
-              console.log(talkback.lang)
-              tts.speak(messages[talkback.lang]["timeLeft"].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
-              //say.speak('About '.concat(appliance.timeInMins).concat(' minutes left on the ').concat(appliance.name), 'voice_us2_mbrola')
+            if (!appliance.buttonPressed) {
+              if (appliance.name === 'dryer') {
+                tts.speak(messages[talkback.lang][erds.DRY_TEMP].replace('%1', appliance.dryTemp)+ ',' + messages[talkback.lang]['timeLeft'].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
+              } else if (appliance.name === 'washer') {
+                let spinLevelMessage = messages[talkback.lang][erds.SPIN_LEVEL].replace('%1', appliance.spinLevel)
+                let soilLevelMessage = messages[talkback.lang][erds.SOIL_LEVEL].replace('%1', appliance.soilLevel)
+                let waterTempMessage = messages[talkback.lang][erds.WATER_TEMP].replace('%1', appliance.waterTemp)
+                tts.speak(spinLevelMessage + ',' + soilLevelMessage + ',' + waterTempMessage + ',' + messages[talkback.lang]["timeLeft"].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
+              }
             }
             appliance.buttonPressed = true
           } else {
@@ -67,7 +73,7 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
     setInterval(function() {
       var pin = fs.readFileSync(GPIO_PATH + '/gpio22/value').toString().replace(/\n$/, '')
       var langs = ['en', 'es']
-      talkback.lang = langs[(langs.indexOf(talkback.lang) + 1) % langs.length]
+      //talkback.lang = langs[(langs.indexOf(talkback.lang) + 1) % langs.length]
     }, 100)
   }
 

@@ -8,7 +8,7 @@ const messages = require('./messages')
 const tts = require('./tts')
 
 const talkback = (function () {
-  let lang = 'es'
+  let lang = 'en'
   const app = gea.configure({
     address: 0xCB,
     version: [0, 0, 1, 0]
@@ -41,6 +41,9 @@ const talkback = (function () {
   function start () {
     app.bind(adapter, function (bus) {
       bus.on('publish', function (erd) {
+        if (erd.erd === erds.STAIN_PRETREAT) {
+          console.log("stain pretreat")
+        }
         appliances.map(function (appliance) {
           if (appliance.id === erd.source) {
             appliance.buffer.add(erd)
@@ -151,20 +154,23 @@ const talkback = (function () {
 
   function handleWaterTemp (event, appliance) {
     let waterTemp = erds.erd(erds.WATER_TEMP).data(event)
+    appliance.waterTemp = enums[lang].waterTemp[waterTemp]
     tts.speak(messages[lang][erds.WATER_TEMP]
-              .replace('%1', enums[lang].waterTemp[waterTemp]), lang)
+              .replace('%1', appliance.waterTemp), lang)
   }
 
   function handleSpinLevel (event, appliance) {
     let spinLevel = erds.erd(erds.SPIN_LEVEL).data(event)
+    appliance.spinLevel = enums[lang].spinLevel[spinLevel]
     tts.speak(messages[lang][erds.SPIN_LEVEL]
-              .replace('%1', enums[lang].spinLevel[spinLevel]), lang)
+              .replace('%1', appliance.spinLevel), lang)
   }
 
   function handleSoilLevel (event, appliance) {
     let soilLevel = erds.erd(erds.SOIL_LEVEL).data(event)
+    appliance.waterTemp = enums[lang].soilLevel[soilLevel]
     tts.speak(messages[lang][erds.SOIL_LEVEL]
-              .replace('%1', enums[lang].soilLevel[soilLevel]), lang)
+              .replace('%1', appliance.waterTemp), lang)
   }
 
   function handleMachineStatus (event, appliance) {
@@ -186,10 +192,10 @@ const talkback = (function () {
       }
   }
 
-  function handleDryTemp (event, appliances) {
+  function handleDryTemp (event, appliance) {
     let temp = erds.erd(erds.DRY_TEMP).data(event)
-    tts.speak(messages[lang][erds.DRY_TEMP]
-              .replace('%1', enums[lang].dryTemp[temp]), lang)
+    appliance.dryTemp = enums[lang].dryTemp[temp]
+    tts.speak(messages[lang][erds.DRY_TEMP].replace('%1', appliance.dryTemp))
   }
 
   function handleStainPretreat (event, appliance) {
