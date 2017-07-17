@@ -41,9 +41,9 @@ const talkback = (function () {
   function start () {
     app.bind(adapter, function (bus) {
       bus.on('publish', function (erd) {
-        if (erd.erd === erds.STAIN_PRETREAT) {
-          console.log("stain pretreat")
-        }
+        //if (erd.erd === erds.STAIN_PRETREAT) {
+          //console.log("stain pretreat")
+        //}
         appliances.map(function (appliance) {
           if (appliance.id === erd.source) {
             appliance.buffer.add(erd)
@@ -98,7 +98,7 @@ const talkback = (function () {
       //if (!ignored.includes(event.erd)) {
         //handleSingleEvent(event, appliance)
       //}
-      handleSingleEvent(event, appliance, ignored.includes(event.erd)
+      handleSingleEvent(event, appliance, ignored.includes(event.erd))
     })
   }
 
@@ -175,10 +175,10 @@ const talkback = (function () {
 
   function handleSoilLevel (event, appliance, effect) {
     let soilLevel = erds.erd(erds.SOIL_LEVEL).data(event)
-    appliance.waterTemp = enums[lang].soilLevel[soilLevel]
+    appliance.soilLevel = enums[lang].soilLevel[soilLevel]
     if (!effect) {
       tts.speak(messages[lang][erds.SOIL_LEVEL]
-                .replace('%1', appliance.waterTemp), lang)
+                .replace('%1', appliance.soilLevel), lang)
     }
   }
 
