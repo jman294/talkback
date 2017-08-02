@@ -11,6 +11,7 @@ const erds = (function () {
   const DRY_TEMP = 0x2019
   const STAIN_PRETREAT = 0xF107
   const DEEP_FILL = 0xF123
+  const CYCLE_HISTORY = 0xE009
 
   const erdList = {
     [TIME_SECS]: {
@@ -112,7 +113,8 @@ const erds = (function () {
     MACHINE_STATUS,
     STAIN_PRETREAT,
     DRY_TEMP,
-    DEEP_FILL
+    DEEP_FILL,
+    CYCLE_HISTORY
   }
 
 })()

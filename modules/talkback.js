@@ -8,7 +8,7 @@ const messages = require('./messages')
 const tts = require('./tts')
 
 const talkback = (function () {
-  let lang = 'es'
+  let lang = 'en'
   const app = gea.configure({
     address: 0xCB,
     version: [0, 0, 1, 0]
@@ -48,6 +48,9 @@ const talkback = (function () {
         })
       })
 
+      //bus.on('read-response', function (erd) {
+        
+      
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
@@ -64,6 +67,16 @@ const talkback = (function () {
     appliances.map(function (appliance) {
       appliance.buffer.onFinish(function (buffer) {
         onEvents(buffer, appliance)
+      })
+    })
+  }
+
+  function busRead (bus, source, erd, appliances) {
+    appliances.map(function (appliance) {
+      bus.read({
+        erd: erd,
+        source: source,
+        destination: appliance.id
       })
     })
   }
@@ -92,93 +105,107 @@ const talkback = (function () {
       ignored = ignored.concat(erds.erd(event.erd).causes)
     })
     events.map(function (event) {
-      if (!ignored.includes(event.erd)) {
-        handleSingleEvent(event, appliance)
-      }
+      //if (!ignored.includes(event.erd)) {
+        //handleSingleEvent(event, appliance)
+      //}
+      handleSingleEvent(event, appliance, ignored.includes(event.erd))
     })
   }
 
-  function handleSingleEvent (event, appliance) {
+  function handleSingleEvent (event, appliance, effect) {
     switch (event.erd) {
       case erds.TIME_SECS:
-        handleTimeSecs(event, appliance)
+        handleTimeSecs(event, appliance, effect)
         break
       case erds.TIME_MINS:
-        handleTimeMins(event, appliance)
+        handleTimeMins(event, appliance, effect)
         break
       case erds.CYCLE_SELECTED:
-        handleCycleSelected(event, appliance)
+        handleCycleSelected(event, appliance, effect)
         break
       case erds.WATER_TEMP:
-        handleWaterTemp(event, appliance)
+        handleWaterTemp(event, appliance, effect)
         break
       case erds.SPIN_LEVEL:
-        handleSpinLevel(event, appliance)
+        handleSpinLevel(event, appliance, effect)
         break
       case erds.SOIL_LEVEL:
-        handleSoilLevel(event, appliance)
+        handleSoilLevel(event, appliance, effect)
         break
       case erds.MACHINE_STATUS:
-        handleMachineStatus(event, appliance)
+        handleMachineStatus(event, appliance, effect)
         break
       case erds.DRY_TEMP:
-        handleDryTemp(event, appliance)
+        handleDryTemp(event, appliance, effect)
         break
       case erds.STAIN_PRETREAT:
-        handleStainPretreat(event, appliance)
+        handleStainPretreat(event, appliance, effect)
         break
       case erds.DEEP_FILL:
-        handleDeepFill(event, appliance)
+        handleDeepFill(event, appliance, effect)
         break
     }
   }
 
-  function handleTimeSecs (event, appliance) {
+  function handleTimeSecs (event, appliance, effect) {
     appliance.timeInMins = Math.round(erds.erd(erds.TIME_SECS).data(event))
   }
 
-  function handleTimeMins (event, appliance) {
+  function handleTimeMins (event, appliance, effect) {
     appliance.timeInMins = erds.erd(erds.TIME_MINS).data(event)
   }
 
-  function handleCycleSelected (event, appliance) {
+  function handleCycleSelected (event, appliance, effect) {
     let newCycle = erds.erd(erds.CYCLE_SELECTED).data(event)
     if (newCycle !== appliance.oldCycle) {
-      tts.speak(enums.makeReadable(enums[lang].cycle[newCycle]), lang)
+      if (!effect) {
+        tts.speak(enums.makeReadable(enums[lang].cycle[newCycle]), lang)
+      }
     }
     appliance.oldCycle = newCycle
   }
 
-  function handleWaterTemp (event, appliance) {
+  function handleWaterTemp (event, appliance, effect) {
     let waterTemp = erds.erd(erds.WATER_TEMP).data(event)
-    tts.speak(messages[lang][erds.WATER_TEMP]
-              .replace('%1', enums[lang].waterTemp[waterTemp]), lang)
+    appliance.waterTemp = enums[lang].waterTemp[waterTemp]
+    if (!effect) {
+      tts.speak(messages[lang][erds.WATER_TEMP]
+                .replace('%1', appliance.waterTemp), lang)
+    }
   }
 
-  function handleSpinLevel (event, appliance) {
+  function handleSpinLevel (event, appliance, effect) {
     let spinLevel = erds.erd(erds.SPIN_LEVEL).data(event)
-    tts.speak(messages[lang][erds.SPIN_LEVEL]
-              .replace('%1', enums[lang].spinLevel[spinLevel]), lang)
+    appliance.spinLevel = enums[lang].spinLevel[spinLevel]
+    if (!effect) {
+      tts.speak(messages[lang][erds.SPIN_LEVEL]
+                .replace('%1', appliance.spinLevel), lang)
+    }
   }
 
-  function handleSoilLevel (event, appliance) {
+  function handleSoilLevel (event, appliance, effect) {
     let soilLevel = erds.erd(erds.SOIL_LEVEL).data(event)
-    tts.speak(messages[lang][erds.SOIL_LEVEL]
-              .replace('%1', enums[lang].soilLevel[soilLevel]), lang)
+    appliance.soilLevel = enums[lang].soilLevel[soilLevel]
+    if (!effect) {
+      tts.speak(messages[lang][erds.SOIL_LEVEL]
+                .replace('%1', appliance.soilLevel), lang)
+    }
   }
 
-  function handleMachineStatus (event, appliance) {
+  function handleMachineStatus (event, appliance, effect) {
     let machineStatus = erds.erd(erds.MACHINE_STATUS).data(event)
       if (machineStatus === 2) {
         appliance.inACycle = true
         if (appliance.startButton) {
           appliance.startButton = false
-          tts.speak(
-              messages[lang][erds.MACHINE_STATUS]
-              .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
-              .replace('%2', appliance.timeInMins)
-              , lang
-          )
+          if (!effect) {
+            tts.speak(
+                messages[lang][erds.MACHINE_STATUS]
+                .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
+                .replace('%2', appliance.timeInMins)
+                , lang
+            )
+          }
         }
       } else {
         appliance.startButton = true
@@ -186,22 +213,28 @@ const talkback = (function () {
       }
   }
 
-  function handleDryTemp (event, appliances) {
+  function handleDryTemp (event, appliance, effect) {
     let temp = erds.erd(erds.DRY_TEMP).data(event)
-    tts.speak(messages[lang][erds.DRY_TEMP]
-              .replace('%1', enums[lang].dryTemp[temp]), lang)
+    appliance.dryTemp = enums[lang].dryTemp[temp]
+    if (!effect) {
+      tts.speak(messages[lang][erds.DRY_TEMP].replace('%1', appliance.dryTemp))
+    }
   }
 
-  function handleStainPretreat (event, appliance) {
+  function handleStainPretreat (event, appliance, effect) {
     let level = erds.erd(erds.STAIN_PRETREAT).data(event)
-    tts.speak(messages[lang][erds.STAIN_PRETREAT]
-              .replace('%1', enums[lang].stainPretreat[level]), lang)
+    if (!effect) {
+      tts.speak(messages[lang][erds.STAIN_PRETREAT]
+                .replace('%1', enums[lang].stainPretreat[level]), lang)
+    }
   }
 
-  function handleDeepFill (event, appliance) {
+  function handleDeepFill (event, appliance, effect) {
     let state = erds.erd(erds.DEEP_FILL).data(event)
-    tts.speak(messages[lang][erds.DEEP_FILL]
-              .replace('%1', enums[lang].deepFill[state]), lang)
+    if (!effect) {
+      tts.speak(messages[lang][erds.DEEP_FILL]
+                .replace('%1', enums[lang].deepFill[state]), lang)
+    }
   }
 
   return {
