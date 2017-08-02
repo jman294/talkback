@@ -51,9 +51,32 @@ const talkback = (function () {
         })
       })
 
-      //bus.on('read-response', function (erd) {
-        
-      
+      bus.on('read-response', function (erd) {
+        appliances.map(function (appliance) {
+          if (appliance.id === erd.source) {
+            switch (erd.erd) {
+              case erds.WATER_TEMP:
+                appliance.waterTemp = enums[lang].waterTemp[erds.erd(erds.WATER_TEMP).data(erd)]
+                break
+              case erds.SPIN_LEVEL:
+                appliance.spinLevel = enums[lang].spinLevel[erds.erd(erds.SPIN_LEVEL).data(erd)]
+                break
+              case erds.SOIL_LEVEL:
+                appliance.soilLevel = enums[lang].soilLevel[erds.erd(erds.SOIL_LEVEL).data(erd)]
+                break
+              case erds.DRY_TEMP:
+                appliance.dryTemp = enums[lang].dryTemp[erds.erd(erds.DRY_TEMP).data(erd)]
+                break
+            }
+          }
+        })
+      })
+
+      busRead(bus, SOURCE, erds.WATER_TEMP, [appliances[0]])
+      busRead(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
+      busRead(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
+      busRead(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
+
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
