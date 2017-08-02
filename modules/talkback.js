@@ -51,6 +51,9 @@ const talkback = (function () {
         })
       })
 
+      //bus.on('read-response', function (erd) {
+        
+      
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
@@ -67,6 +70,16 @@ const talkback = (function () {
     appliances.map(function (appliance) {
       appliance.buffer.onFinish(function (buffer) {
         onEvents(buffer, appliance)
+      })
+    })
+  }
+
+  function busRead (bus, source, erd, appliances) {
+    appliances.map(function (appliance) {
+      bus.read({
+        erd: erd,
+        source: source,
+        destination: appliance.id
       })
     })
   }
