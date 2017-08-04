@@ -27,6 +27,16 @@ const enumerations = (function () {
       16: 'tap cold'
     },
 
+    machineStatus: {
+      0: 'idle',
+      1: 'standby',
+      2: 'run',
+      3: 'pause',
+      4: 'end of cycle',
+      6: 'delay run',
+      7: 'delay pause'
+    },
+
     cycle: {
       0: 'blank',
       1: 'basket_clean',
@@ -113,6 +123,16 @@ const enumerations = (function () {
       18: 'cool',
       17: 'cold',
       16: 'tap cold'
+    },
+
+    machineStatus: {
+      0: 'idle',
+      1: 'standby',
+      2: 'run',
+      3: 'pause',
+      4: 'end of cycle',
+      6: 'delay run',
+      7: 'delay pause'
     },
 
     cycle: {

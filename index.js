@@ -22,12 +22,25 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
           if (data == 0) {
             if (!appliance.buttonPressed) {
               if (appliance.name === 'dryer') {
-                tts.speak(messages[talkback.lang][erds.DRY_TEMP].replace('%1', appliance.dryTemp)+ ' , ' + messages[talkback.lang]['timeLeft'].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
+                if (appliance.inACycle) {
+                  let message = messages[talkback.lang].dryerRunStatus
+                  tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins))
+                } else {
+                  let message = messages[talkback.lang].dryerStatus
+                  tts.speak(message.replace('%1', appliance.machineStatus).replace('%2', enums[talkback.lang].cycle[appliance.oldCycle]))
+                }
               } else if (appliance.name === 'washer') {
-                let spinLevelMessage = messages[talkback.lang][erds.SPIN_LEVEL].replace('%1', appliance.spinLevel)
-                let soilLevelMessage = messages[talkback.lang][erds.SOIL_LEVEL].replace('%1', appliance.soilLevel)
-                let waterTempMessage = messages[talkback.lang][erds.WATER_TEMP].replace('%1', appliance.waterTemp)
-                tts.speak(spinLevelMessage + ' , ' + soilLevelMessage + ' , ' + waterTempMessage + ' , ' + messages[talkback.lang]["timeLeft"].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
+                if (appliance.inACycle) {
+                  let message = messages[talkback.lang].washerRunStatus
+                  tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins))
+                } else {
+                  let message = messages[talkback.lang].washerStatus
+                  tts.speak(message.replace('%1', appliance.machineStatus).replace('%2', enums[talkback.lang].cycle[appliance.oldCycle]))
+                }
+                //let spinLevelMessage = messages[talkback.lang][erds.SPIN_LEVEL].replace('%1', appliance.spinLevel)
+                //let soilLevelMessage = messages[talkback.lang][erds.SOIL_LEVEL].replace('%1', appliance.soilLevel)
+                //let waterTempMessage = messages[talkback.lang][erds.WATER_TEMP].replace('%1', appliance.waterTemp)
+                //tts.speak(spinLevelMessage + ' , ' + soilLevelMessage + ' , ' + waterTempMessage + ' , ' + messages[talkback.lang]["timeLeft"].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
               }
             }
             appliance.buttonPressed = true

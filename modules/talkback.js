@@ -220,23 +220,24 @@ const talkback = (function () {
 
   function handleMachineStatus (event, appliance, effect) {
     let machineStatus = erds.erd(erds.MACHINE_STATUS).data(event)
-      if (machineStatus === 2) {
-        appliance.inACycle = true
-        if (appliance.startButton) {
-          appliance.startButton = false
-          if (!effect) {
-            tts.speak(
-                messages[lang][erds.MACHINE_STATUS]
-                .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
-                .replace('%2', appliance.timeInMins)
-                , lang
-            )
-          }
+    appliance.machineStatus = enums[lang].machineStatus[machineStatus]
+    if (machineStatus === 2) {
+      appliance.inACycle = true
+      if (appliance.startButton) {
+        appliance.startButton = false
+        if (!effect) {
+          tts.speak(
+              messages[lang][erds.MACHINE_STATUS]
+              .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
+              .replace('%2', appliance.timeInMins)
+              , lang
+          )
         }
-      } else {
-        appliance.startButton = true
-        appliance.inACycle = false
       }
+    } else {
+      appliance.startButton = true
+      appliance.inACycle = false
+    }
   }
 
   function handleDryTemp (event, appliance, effect) {

@@ -9,7 +9,11 @@ const messages = (function () {
     [erds.DRY_TEMP]: 'dry temp: %1',
     [erds.STAIN_PRETREAT]: 'stain pretreat: %1',
     [erds.DEEP_FILL]: 'deep fill: %1',
-    timeLeft: 'About %1 minutes left on the %2.'
+    timeLeft: 'About %1 minutes left on the %2.',
+    washerRunStatus: 'Washer currently running %1 with about %2 minutes left',
+    washerStatus: 'Washer currently %1 with %2 selected',
+    dryerRunStatus: 'Dryer currently running %1 with about %2 minutes left',
+    dryerStatus: 'Dryer currently %1 with %2 selected'
   }
 
   const es = {
@@ -20,7 +24,11 @@ const messages = (function () {
     [erds.DRY_TEMP]: 'temp seca: %1',
     [erds.STAIN_PRETREAT]: 'mancha pretratamiento: %1',
     [erds.DEEP_FILL]: 'relleno profundo: %1',
-    timeLeft: 'About %1 minutes left on the %2.'
+    timeLeft: 'About %1 minutes left on the %2.',
+    washerRunStatus: 'Washer currently running %1 with about %2 minutes left',
+    washerStatus: 'Washer currently %1 with %2 selected',
+    dryerRunStatus: 'Dryer currently running %1 with about %2 minutes left',
+    dryerStatus: 'Dryer currently %1 with %2 selected'
   }
 
   return {
