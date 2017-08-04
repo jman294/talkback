@@ -24,18 +24,18 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
               if (appliance.name === 'dryer') {
                 if (appliance.inACycle) {
                   let message = messages[talkback.lang].dryerRunStatus
-                  tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins))
+                  tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins), talkback.lang)
                 } else {
                   let message = messages[talkback.lang].dryerStatus
-                  tts.speak(message.replace('%1', appliance.machineStatus).replace('%2', enums[talkback.lang].cycle[appliance.oldCycle]))
+                  tts.speak(message.replace('%1', appliance.machineStatus).replace('%2', enums[talkback.lang].cycle[appliance.oldCycle]), talkback.lang)
                 }
               } else if (appliance.name === 'washer') {
                 if (appliance.inACycle) {
                   let message = messages[talkback.lang].washerRunStatus
-                  tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins))
+                  tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins), talkback.lang)
                 } else {
                   let message = messages[talkback.lang].washerStatus
-                  tts.speak(message.replace('%1', appliance.machineStatus).replace('%2', enums[talkback.lang].cycle[appliance.oldCycle]))
+                  tts.speak(message.replace('%1', appliance.machineStatus).replace('%2', enums[talkback.lang].cycle[appliance.oldCycle]), talkback.lang)
                 }
                 //let spinLevelMessage = messages[talkback.lang][erds.SPIN_LEVEL].replace('%1', appliance.spinLevel)
                 //let soilLevelMessage = messages[talkback.lang][erds.SOIL_LEVEL].replace('%1', appliance.soilLevel)
