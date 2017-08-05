@@ -72,10 +72,10 @@ const talkback = (function () {
         })
       })
 
+      busRead(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
       busRead(bus, SOURCE, erds.WATER_TEMP, [appliances[0]])
       busRead(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busRead(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
-      busRead(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
 
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
