@@ -11,9 +11,9 @@ const messages = (function () {
     [erds.DEEP_FILL]: 'deep fill: %1',
     timeLeft: 'About %1 minutes left on the %2.',
     washerRunStatus: 'Washer currently running %1 with about %2 minutes left',
-    washerStatus: 'Washer currently %1 with %2 selected',
+    washerStatus: 'Washer currently %1 with %2 selected and soil level %3, spin level %4, and water temp %5',
     dryerRunStatus: 'Dryer currently running %1 with about %2 minutes left',
-    dryerStatus: 'Dryer currently %1 with %2 selected'
+    dryerStatus: 'Dryer currently %1 with %2 selected and dry temp %3'
   }
 
   const es = {
