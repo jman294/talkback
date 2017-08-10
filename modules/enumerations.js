@@ -29,7 +29,7 @@ const enumerations = (function () {
 
     machineStatus: {
       0: 'idle',
-      1: 'standby',
+      1: 'waiting',
       2: 'run',
       3: 'pause',
       4: 'end of cycle',
@@ -129,7 +129,7 @@ const enumerations = (function () {
       0: 'idle',
       1: 'standby',
       2: 'run',
-      3: 'pause',
+      3: 'paused',
       4: 'end of cycle',
       6: 'delay run',
       7: 'delay pause'

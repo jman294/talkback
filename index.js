@@ -25,6 +25,8 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
                 if (appliance.inACycle) {
                   let message = messages[talkback.lang].dryerRunStatus
                   tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins), talkback.lang)
+                } else if (appliance.machineStatus === 'idle') {
+                  tts.speak(messages[talkback.lang].off.replace('%1', appliance.name), talkback.lang)
                 } else {
                   let message = messages[talkback.lang].dryerStatus
                   tts.speak(message.replace('%1', appliance.machineStatus)
@@ -35,6 +37,8 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
                 if (appliance.inACycle) {
                   let message = messages[talkback.lang].washerRunStatus
                   tts.speak(message.replace('%1',  enums[talkback.lang].cycle[appliance.oldCycle]).replace('%2', appliance.timeInMins), talkback.lang)
+                } else if (appliance.machineStatus === 'idle') {
+                  tts.speak(messages[talkback.lang].off.replace('%1', appliance.name), talkback.lang)
                 } else {
                   let message = messages[talkback.lang].washerStatus
                   tts.speak(message.replace('%1', appliance.machineStatus)
@@ -43,10 +47,6 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
                                    .replace('%4', appliance.spinLevel)
                                    .replace('%5', appliance.waterTemp), talkback.lang)
                 }
-                //let spinLevelMessage = messages[talkback.lang][erds.SPIN_LEVEL].replace('%1', appliance.spinLevel)
-                //let soilLevelMessage = messages[talkback.lang][erds.SOIL_LEVEL].replace('%1', appliance.soilLevel)
-                //let waterTempMessage = messages[talkback.lang][erds.WATER_TEMP].replace('%1', appliance.waterTemp)
-                //tts.speak(spinLevelMessage + ' , ' + soilLevelMessage + ' , ' + waterTempMessage + ' , ' + messages[talkback.lang]["timeLeft"].replace('%1', appliance.timeInMins).replace('%2', appliance.name), talkback.lang)
               }
             }
             appliance.buttonPressed = true
