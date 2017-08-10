@@ -9,6 +9,7 @@ const messages = (function () {
     [erds.DRY_TEMP]: 'dry temp: %1',
     [erds.STAIN_PRETREAT]: 'stain pretreat: %1',
     [erds.DEEP_FILL]: 'deep fill: %1',
+    [erds.LOAD_SIZE]: 'load size: %1',
     timeLeft: 'About %1 minutes left on the %2.',
     off: '%1 off',
     washerRunStatus: 'Washer currently running %1 with about %2 minutes left',

@@ -12,6 +12,7 @@ const erds = (function () {
   const STAIN_PRETREAT = 0xF107
   const DEEP_FILL = 0xF123
   const CYCLE_HISTORY = 0xE009
+  const LOAD_SIZE = 0xF109
 
   const erdList = {
     [TIME_SECS]: {
@@ -58,6 +59,13 @@ const erds = (function () {
     },
     [SOIL_LEVEL]: {
       causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [LOAD_SIZE]: {
+      casues: [],
       alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
@@ -110,6 +118,7 @@ const erds = (function () {
     WATER_TEMP,
     SPIN_LEVEL,
     SOIL_LEVEL,
+    LOAD_SIZE,
     MACHINE_STATUS,
     STAIN_PRETREAT,
     DRY_TEMP,

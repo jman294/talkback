@@ -41,9 +41,6 @@ const talkback = (function () {
   function start () {
     app.bind(adapter, function (bus) {
       bus.on('publish', function (erd) {
-        //if (erd.erd === erds.STAIN_PRETREAT) {
-          //console.log("stain pretreat")
-        //}
         appliances.map(function (appliance) {
           if (appliance.id === erd.source) {
             appliance.buffer.add(erd)
@@ -77,6 +74,7 @@ const talkback = (function () {
       busRead(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busRead(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
 
+      busSubscribe(bus, SOURCE, erds.LOAD_SIZE, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
@@ -158,6 +156,9 @@ const talkback = (function () {
       case erds.SOIL_LEVEL:
         handleSoilLevel(event, appliance, effect)
         break
+      case erds.LOAD_SIZE:
+        handleLoadSize(event, appliance, effect)
+        break
       case erds.MACHINE_STATUS:
         handleMachineStatus(event, appliance, effect)
         break
@@ -215,6 +216,15 @@ const talkback = (function () {
     if (!effect) {
       tts.speak(messages[lang][erds.SOIL_LEVEL]
                 .replace('%1', appliance.soilLevel), lang)
+    }
+  }
+
+  function handleLoadSize (event, appliance, effect) {
+    let loadSize = erds.erd(erds.LOAD_SIZE).data(event)
+    appliance.loadSize = enums[lang].loadSize[loadSize]
+    if (!effect) {
+      tts.speak(messages[lang][erds.LOAD_SIZE]
+                .replace('%1', appliance.loadSize), lang)
     }
   }
 

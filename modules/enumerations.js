@@ -37,6 +37,14 @@ const enumerations = (function () {
       7: 'delay pause'
     },
 
+    loadSize: {
+      0: 'small',
+      1: 'medium',
+      2: 'large',
+      3: 'super',
+      4: 'precise fill'
+    },
+
     cycle: {
       0: 'blank',
       1: 'basket_clean',
