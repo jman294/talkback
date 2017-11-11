@@ -68,6 +68,7 @@ const enumerations = (function () {
       19: 'single_item',
       20: 'colors',
       21: 'cold_wash',
+      22: 'water_station',
       128: 'cottons',
       129: 'easy_care',
       130: 'active_wear',

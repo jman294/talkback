@@ -10,9 +10,18 @@ const erds = (function () {
   const MACHINE_STATUS = 0x2000
   const DRY_TEMP = 0x2019
   const STAIN_PRETREAT = 0xF107
-  const DEEP_FILL = 0xF123
+  //const DEEP_FILL = 0xF123
   const CYCLE_HISTORY = 0xE009
   const LOAD_SIZE = 0xF109
+  // added by sam duplessis 11-8-17
+  const EXTRA_RINSE = 0x2018
+  const DEEP_RINSE = 0x2018
+  const DELAY_WASH = 0x2010
+  const DEEP_FILL = 0x202E
+  const WARM_RINSE = 0x2025
+  const SOAK = 0x2028
+  const VOLUME = 0x000A
+  const STAIN = 0x2024
 
   const erdList = {
     [TIME_SECS]: {

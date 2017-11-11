@@ -74,7 +74,7 @@ const talkback = (function () {
       busRead(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busRead(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
 
-      busSubscribe(bus, SOURCE, erds.LOAD_SIZE, [appliances[0]])
+      //busSubscribe(bus, SOURCE, erds.LOAD_SIZE, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
