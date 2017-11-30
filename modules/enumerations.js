@@ -119,6 +119,26 @@ const enumerations = (function () {
     warmRinse: {
       0: 'off',
       1: ''
+    },
+
+    delayWash: {
+      0: 'off',
+      1: '',
+    },
+
+    soak: {
+      0: 'off',
+      1: '',
+    },
+
+    volume: {
+      0: 'off',
+      1: '',
+    },
+
+    stain: {
+      0: 'off',
+      1: 'on'
     }
   }
 
