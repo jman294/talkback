@@ -105,7 +105,7 @@ const enumerations = (function () {
       0: 'off',
       1: ''
     },
-      
+
     extraRinse: {
       0: 'off',
       1: ''
@@ -113,7 +113,8 @@ const enumerations = (function () {
 
     deepRinse: {
       0: 'off',
-      1: ''
+      1: '',
+      2: '',
     },
 
     warmRinse: {
@@ -138,7 +139,11 @@ const enumerations = (function () {
 
     stain: {
       0: 'off',
-      1: 'on'
+      1: 'tomato',
+      2: 'wine',
+      3: 'blood',
+      4: 'grass',
+      5: 'dirt'
     }
   }
 

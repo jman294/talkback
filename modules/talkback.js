@@ -83,6 +83,7 @@ const talkback = (function () {
       busSubscribe(bus, SOURCE, erds.TIME_SECS, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.TIME_MINS, [appliances[0]])
 
+      busSubscribe(bus, SOURCE, erds.STAIN, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.WATER_TEMP, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
@@ -177,10 +178,12 @@ const talkback = (function () {
         handleDeepFill(event, appliance, effect)
         break
       case erds.EXTRA_RINSE:
+        console.log('extra rinse', event.data)
         //handleExtraRinse(event, appliance, effect)
         handleDeepRinse(event, appliance, effect)
         break
       case erds.DEEP_RINSE:
+        console.log(event.data)
         handleDeepRinse(event, appliance, effect)
         break
       case erds.DELAY_WASH:
@@ -310,7 +313,7 @@ const talkback = (function () {
   }
 
   function handleDeepRinse (event, appliance, effect) {
-    let state = erds.erd(erds.DEEP_RINSE).data(event) || 0
+    let state = erds.erd(erds.DEEP_RINSE).data(event)
     if (!effect) {
       tts.speak(messages[lang][erds.DEEP_RINSE]
                 .replace('%1', enums[lang].deepRinse[state]), lang)
