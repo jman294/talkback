@@ -321,7 +321,7 @@ const talkback = (function () {
     let state = erds.erd(erds.DELAY_WASH).data(event)
     if (!effect) {
       tts.speak(messages[lang][erds.DELAY_WASH]
-                .replace('%1', enums[lang].deepFill[state]), lang)
+                .replace('%1', enums[lang].delayWash[state]), lang)
     }
   }
 
@@ -329,7 +329,7 @@ const talkback = (function () {
     let state = erds.erd(erds.WARM_RINSE).data(event)
     if (!effect) {
       tts.speak(messages[lang][erds.WARM_RINSE]
-                .replace('%1', enums[lang].deepFill[state]), lang)
+                .replace('%1', enums[lang].warmRinse[state]), lang)
     }
   }
 
@@ -337,7 +337,7 @@ const talkback = (function () {
     let state = erds.erd(erds.SOAK).data(event)
     if (!effect) {
       tts.speak(messages[lang][erds.SOAK]
-                .replace('%1', enums[lang].deepFill[state]), lang)
+                .replace('%1', enums[lang].soak[state]), lang)
     }
   }
 
@@ -345,7 +345,7 @@ const talkback = (function () {
     let state = erds.erd(erds.VOLUME).data(event)
     if (!effect) {
       tts.speak(messages[lang][erds.VOLUME]
-                .replace('%1', enums[lang].deepFill[state]), lang)
+                .replace('%1', enums[lang].volume[state]), lang)
     }
   }
 
@@ -353,7 +353,7 @@ const talkback = (function () {
     let state = erds.erd(erds.STAIN).data(event)
     if (!effect) {
       tts.speak(messages[lang][erds.STAIN]
-                .replace('%1', enums[lang].deepFill[state]), lang)
+                .replace('%1', enums[lang].stain[state]), lang)
     }
   }
 
