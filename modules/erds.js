@@ -64,13 +64,13 @@ const erds = (function () {
         return erd.data[0]
       }
     },
-    [DEEP_RINSE]: {
-      causes: [TIME_MINS, SOIL_LEVEL, SPIN_LEVEL],
-      alwaysRun: false,
-      data: function (erd) {
-        return erd.data[0]
-      }
-    },
+    //[DEEP_RINSE]: {
+      //causes: [TIME_MINS, SOIL_LEVEL, SPIN_LEVEL],
+      //alwaysRun: false,
+      //data: function (erd) {
+        //return erd.data[0]
+      //}
+    //},
     [EXTRA_RINSE]: {
       causes: [TIME_MINS, SOIL_LEVEL, SPIN_LEVEL],
       alwaysRun: false,

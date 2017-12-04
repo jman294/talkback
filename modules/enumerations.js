@@ -106,15 +106,16 @@ const enumerations = (function () {
       1: ''
     },
 
-    extraRinse: {
-      0: 'off',
-      1: ''
-    },
-
     deepRinse: {
       0: 'off',
       1: '',
+    },
+
+    extraRinse: {
+      1: '',
+      0: 'off',
       2: '',
+      3: 'off'
     },
 
     warmRinse: {

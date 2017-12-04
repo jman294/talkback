@@ -178,12 +178,9 @@ const talkback = (function () {
         handleDeepFill(event, appliance, effect)
         break
       case erds.EXTRA_RINSE:
-        console.log('extra rinse', event.data)
-        //handleExtraRinse(event, appliance, effect)
-        handleDeepRinse(event, appliance, effect)
+        handleExtraRinse(event, appliance, effect)
         break
       case erds.DEEP_RINSE:
-        console.log(event.data)
         handleDeepRinse(event, appliance, effect)
         break
       case erds.DELAY_WASH:
