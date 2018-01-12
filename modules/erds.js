@@ -10,10 +10,75 @@ const erds = (function () {
   const MACHINE_STATUS = 0x2000
   const DRY_TEMP = 0x2019
   const STAIN_PRETREAT = 0xF107
-  const DEEP_FILL = 0xF123
   const CYCLE_HISTORY = 0xE009
+  const LOAD_SIZE = 0xF109
+  // added by sam duplessis 11-8-17
+  const DEEP_FILL = 0x202E
+  const EXTRA_RINSE = 0x2018
+  const DEEP_RINSE = 0x2018
+  const DELAY_WASH = 0x2010
+  const WARM_RINSE = 0x2025
+  const SOAK = 0x2028
+  const VOLUME = 0x000A
+  const STAIN = 0x2024
 
   const erdList = {
+    [STAIN]: {
+      causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [VOLUME]: {
+      causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [SOAK]: {
+      causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [WARM_RINSE]: {
+      causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [DEEP_FILL]: {
+      causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [DELAY_WASH]: {
+      causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [DEEP_RINSE]: {
+      causes: [SOIL_LEVEL],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [EXTRA_RINSE]: {
+      causes: [TIME_MINS],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
     [TIME_SECS]: {
       causes: [],
       alwaysRun: true,
@@ -29,7 +94,7 @@ const erds = (function () {
       }
     },
     [CYCLE_SELECTED]: {
-      causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL, DRY_TEMP, STAIN_PRETREAT, DEEP_FILL],
+      causes: [WATER_TEMP, SOIL_LEVEL, SPIN_LEVEL, DRY_TEMP, STAIN_PRETREAT, DEEP_FILL, DEEP_RINSE],
       alwaysRun: true,
       data: function (erd) {
         return erd.data[0]
@@ -58,6 +123,13 @@ const erds = (function () {
     },
     [SOIL_LEVEL]: {
       causes: [],
+      alwaysRun: false,
+      data: function (erd) {
+        return erd.data[0]
+      }
+    },
+    [LOAD_SIZE]: {
+      casues: [],
       alwaysRun: false,
       data: function (erd) {
         return erd.data[0]
@@ -110,11 +182,19 @@ const erds = (function () {
     WATER_TEMP,
     SPIN_LEVEL,
     SOIL_LEVEL,
+    LOAD_SIZE,
     MACHINE_STATUS,
     STAIN_PRETREAT,
     DRY_TEMP,
     DEEP_FILL,
-    CYCLE_HISTORY
+    CYCLE_HISTORY,
+    EXTRA_RINSE,
+    DEEP_RINSE,
+    DELAY_WASH,
+    WARM_RINSE,
+    SOAK,
+    VOLUME,
+    STAIN
   }
 
 })()

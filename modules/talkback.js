@@ -48,20 +48,49 @@ const talkback = (function () {
         })
       })
 
-      //bus.on('read-response', function (erd) {
-        
-      
+      bus.on('read-response', function (erd) {
+        appliances.map(function (appliance) {
+          if (appliance.id === erd.source) {
+            switch (erd.erd) {
+              case erds.WATER_TEMP:
+                appliance.waterTemp = enums[lang].waterTemp[erds.erd(erds.WATER_TEMP).data(erd)]
+                break
+              case erds.SPIN_LEVEL:
+                appliance.spinLevel = enums[lang].spinLevel[erds.erd(erds.SPIN_LEVEL).data(erd)]
+                break
+              case erds.SOIL_LEVEL:
+                appliance.soilLevel = enums[lang].soilLevel[erds.erd(erds.SOIL_LEVEL).data(erd)]
+                break
+              case erds.DRY_TEMP:
+                appliance.dryTemp = enums[lang].dryTemp[erds.erd(erds.DRY_TEMP).data(erd)]
+                break
+            }
+          }
+        })
+      })
+
+      busRead(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
+      busRead(bus, SOURCE, erds.WATER_TEMP, [appliances[0]])
+      busRead(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
+      busRead(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
+
+      //busSubscribe(bus, SOURCE, erds.LOAD_SIZE, [appliances[0]])
+
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.CYCLE_SELECTED, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.MACHINE_STATUS, appliances)
+
       busSubscribe(bus, SOURCE, erds.TIME_SECS, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.TIME_MINS, [appliances[0]])
+
       busSubscribe(bus, SOURCE, erds.WATER_TEMP, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SOIL_LEVEL, [appliances[0]])
       busSubscribe(bus, SOURCE, erds.SPIN_LEVEL, [appliances[0]])
-      busSubscribe(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
       busSubscribe(bus, SOURCE, erds.DEEP_FILL, [appliances[0]])
-      busSubscribe(bus, SOURCE, erds.STAIN_PRETREAT, [appliances[0]])
+      busSubscribe(bus, SOURCE, erds.WARM_RINSE, [appliances[0]])
+      busSubscribe(bus, SOURCE, erds.EXTRA_RINSE, [appliances[0]])
+
+      busSubscribe(bus, SOURCE, erds.DRY_TEMP, [appliances[1]])
     })
 
     appliances.map(function (appliance) {
@@ -132,6 +161,9 @@ const talkback = (function () {
       case erds.SOIL_LEVEL:
         handleSoilLevel(event, appliance, effect)
         break
+      case erds.LOAD_SIZE:
+        handleLoadSize(event, appliance, effect)
+        break
       case erds.MACHINE_STATUS:
         handleMachineStatus(event, appliance, effect)
         break
@@ -143,6 +175,28 @@ const talkback = (function () {
         break
       case erds.DEEP_FILL:
         handleDeepFill(event, appliance, effect)
+        break
+      case erds.EXTRA_RINSE:
+        //handleExtraRinse(event, appliance, effect)
+        handleDeepRinse(event, appliance, effect)
+        break
+      case erds.DEEP_RINSE:
+        handleDeepRinse(event, appliance, effect)
+        break
+      case erds.DELAY_WASH:
+        handleDelayWash(event, appliance, effect)
+        break
+      case erds.WARM_RINSE:
+        handleWarmRinse(event, appliance, effect)
+        break
+      case erds.SOAK:
+        handleSoak(event, appliance, effect)
+        break
+      case erds.VOLUME:
+        handleVolume(event, appliance, effect)
+        break
+      case erds.STAIN:
+        handleStain(event, appliance, effect)
         break
     }
   }
@@ -192,25 +246,35 @@ const talkback = (function () {
     }
   }
 
+  function handleLoadSize (event, appliance, effect) {
+    let loadSize = erds.erd(erds.LOAD_SIZE).data(event)
+    appliance.loadSize = enums[lang].loadSize[loadSize]
+    if (!effect) {
+      tts.speak(messages[lang][erds.LOAD_SIZE]
+                .replace('%1', appliance.loadSize), lang)
+    }
+  }
+
   function handleMachineStatus (event, appliance, effect) {
     let machineStatus = erds.erd(erds.MACHINE_STATUS).data(event)
-      if (machineStatus === 2) {
-        appliance.inACycle = true
-        if (appliance.startButton) {
-          appliance.startButton = false
-          if (!effect) {
-            tts.speak(
-                messages[lang][erds.MACHINE_STATUS]
-                .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
-                .replace('%2', appliance.timeInMins)
-                , lang
-            )
-          }
+    appliance.machineStatus = enums[lang].machineStatus[machineStatus]
+    if (machineStatus === 2) {
+      appliance.inACycle = true
+      if (appliance.startButton) {
+        appliance.startButton = false
+        if (!effect) {
+          tts.speak(
+              messages[lang][erds.MACHINE_STATUS]
+              .replace('%1', enums.makeReadable(enums[lang].cycle[appliance.oldCycle]))
+              .replace('%2', appliance.timeInMins)
+              , lang
+          )
         }
-      } else {
-        appliance.startButton = true
-        appliance.inACycle = false
       }
+    } else {
+      appliance.startButton = true
+      appliance.inACycle = false
+    }
   }
 
   function handleDryTemp (event, appliance, effect) {
@@ -233,6 +297,62 @@ const talkback = (function () {
     let state = erds.erd(erds.DEEP_FILL).data(event)
     if (!effect) {
       tts.speak(messages[lang][erds.DEEP_FILL]
+                .replace('%1', enums[lang].deepFill[state]), lang)
+    }
+  }
+
+  function handleExtraRinse (event, appliance, effect) {
+    let state = erds.erd(erds.EXTRA_RINSE).data(event)
+    if (!effect) {
+      tts.speak(messages[lang][erds.EXTRA_RINSE]
+                .replace('%1', enums[lang].extraRinse[state]), lang)
+    }
+  }
+
+  function handleDeepRinse (event, appliance, effect) {
+    let state = erds.erd(erds.DEEP_RINSE).data(event) || 0
+    if (!effect) {
+      tts.speak(messages[lang][erds.DEEP_RINSE]
+                .replace('%1', enums[lang].deepRinse[state]), lang)
+    }
+  }
+
+  function handleDelayWash (event, appliance, effect) {
+    let state = erds.erd(erds.DELAY_WASH).data(event)
+    if (!effect) {
+      tts.speak(messages[lang][erds.DELAY_WASH]
+                .replace('%1', enums[lang].deepFill[state]), lang)
+    }
+  }
+
+  function handleWarmRinse (event, appliance, effect) {
+    let state = erds.erd(erds.WARM_RINSE).data(event)
+    if (!effect) {
+      tts.speak(messages[lang][erds.WARM_RINSE]
+                .replace('%1', enums[lang].deepFill[state]), lang)
+    }
+  }
+
+  function handleSoak (event, appliance, effect) {
+    let state = erds.erd(erds.SOAK).data(event)
+    if (!effect) {
+      tts.speak(messages[lang][erds.SOAK]
+                .replace('%1', enums[lang].deepFill[state]), lang)
+    }
+  }
+
+  function handleVolume (event, appliance, effect) {
+    let state = erds.erd(erds.VOLUME).data(event)
+    if (!effect) {
+      tts.speak(messages[lang][erds.VOLUME]
+                .replace('%1', enums[lang].deepFill[state]), lang)
+    }
+  }
+
+  function handleStain (event, appliance, effect) {
+    let state = erds.erd(erds.STAIN).data(event)
+    if (!effect) {
+      tts.speak(messages[lang][erds.STAIN]
                 .replace('%1', enums[lang].deepFill[state]), lang)
     }
   }
