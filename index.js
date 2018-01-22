@@ -4,12 +4,11 @@ console.log('talkback version ' + version)
 const loudness = require('loudness')
 const talkback = require('./modules/talkback')
 const fs = require('fs')
-const say = require('say')
 const tts = require('./modules/tts')
 const erds = require('./modules/erds')
 const enums = require('./modules/enumerations')
 const messages = require('./modules/messages')
-talkback.start()
+//talkback.start()
 
 // Only works on Raspberry Pi
 fs.readFile('/proc/cpuinfo', function(err, data) {
@@ -77,18 +76,35 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
       "1101": 16
     }
 
+    var filename = '/home/pi/.talkbackvolume'
+    var volumeLevels = [25, 40, 55, 70, 85, 100]
+    var volumeLevel = parseInt(fs.readFileSync(filename))
     // Read Volume Encoder
     setInterval(function() {
-      var regex = /\n$/
-      var pin1 = fs.readFileSync(GPIO_PATH + '/gpio26/value').toString().replace(regex, '')
-      var pin2 = fs.readFileSync(GPIO_PATH + '/gpio13/value').toString().replace(regex, '')
-      var pin3 = fs.readFileSync(GPIO_PATH + '/gpio6/value').toString().replace(regex, '')
-      var pin4 = fs.readFileSync(GPIO_PATH + '/gpio27/value').toString().replace(regex, '')
-      var num = pin1.concat(pin2).concat(pin3).concat(pin4)
-      loudness.setVolume(90 - encodings[num], function(err) {
+      var up = parseInt(fs.readFileSync(GPIO_PATH + '/gpio6/value'))
+      var down = parseInt(fs.readFileSync(GPIO_PATH + '/gpio13/value'))
+      if (up === 0) {
+        if (volumeLevel < volumeLevels.length) {
+          volumeLevel += 1
+        }
+        tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
+      } else if (down === 0) {
+        if (volumeLevel > 0) {
+          volumeLevel -= 1
+        }
+        tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
+      }
+      if (up === 0 || down === 0) {
+        fs.writeFile(filename, volumeLevel, (err) => {
+          if (err) throw err
+        })
+      }
+      loudness.setVolume(volumeLevels[volumeLevel], function(err) {
         if (err) throw err
       })
     }, 100)
+
+    // Language
     setInterval(function() {
       var pin = fs.readFileSync(GPIO_PATH + '/gpio22/value').toString().replace(/\n$/, '')
       var langs = ['en', 'es']
