@@ -9,7 +9,7 @@ const tts = require('./modules/tts')
 const erds = require('./modules/erds')
 const enums = require('./modules/enumerations')
 const messages = require('./modules/messages')
-//talkback.start()
+talkback.start()
 
 // Only works on Raspberry Pi
 fs.readFile('/proc/cpuinfo', function(err, data) {
