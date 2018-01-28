@@ -4,12 +4,12 @@ console.log('talkback version ' + version)
 const loudness = require('loudness')
 const talkback = require('./modules/talkback')
 const fs = require('fs')
-const say = require('say')
+const os = require('os')
 const tts = require('./modules/tts')
 const erds = require('./modules/erds')
 const enums = require('./modules/enumerations')
 const messages = require('./modules/messages')
-talkback.start()
+//talkback.start()
 
 // Only works on Raspberry Pi
 fs.readFile('/proc/cpuinfo', function(err, data) {
@@ -57,38 +57,47 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
       })
     })
 
-    // Volume encoder wheel map
-    var encodings = {
-      "0101": 1,
-      "0100": 2,
-      "0000": 3,
-      "0001": 4,
-      "0011": 5,
-      "0010": 6,
-      "0110": 7,
-      "0111": 8,
-      "1111": 9,
-      "1110": 10,
-      "1010": 11,
-      "1011": 12,
-      "1001": 13,
-      "1000": 14,
-      "1100": 15,
-      "1101": 16
+    var filename = os.homedir() + '/.talkbackvolume'
+    var volumeLevels = [25, 40, 55, 70, 85]
+    var volumeLevel = 3
+    if (fs.existsSync(filename)) {
+      volumeLevel = parseInt(fs.readFileSync(filename))
+    } else {
+      fs.writeFileSync(ilename, volumeLevel, (err) => {
+        if (err) throw err
+      })
     }
+    var buttonPressed = false
 
-    // Read Volume Encoder
     setInterval(function() {
-      var regex = /\n$/
-      var pin1 = fs.readFileSync(GPIO_PATH + '/gpio26/value').toString().replace(regex, '')
-      var pin2 = fs.readFileSync(GPIO_PATH + '/gpio13/value').toString().replace(regex, '')
-      var pin3 = fs.readFileSync(GPIO_PATH + '/gpio6/value').toString().replace(regex, '')
-      var pin4 = fs.readFileSync(GPIO_PATH + '/gpio27/value').toString().replace(regex, '')
-      var num = pin1.concat(pin2).concat(pin3).concat(pin4)
-      loudness.setVolume(90 - encodings[num], function(err) {
+      var up = parseInt(fs.readFileSync(GPIO_PATH + '/gpio6/value'))
+      var down = parseInt(fs.readFileSync(GPIO_PATH + '/gpio13/value'))
+      if (up === 0 && !buttonPressed) {
+        buttonPressed = true
+        if (volumeLevel < volumeLevels.length) {
+          volumeLevel += 1
+        }
+        tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
+      } else if (down === 0 && !buttonPressed) {
+        buttonPressed = true
+        if (volumeLevel > 0) {
+          volumeLevel -= 1
+        }
+        tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
+      } else if (up === 1 && down === 1) {
+        buttonPressed = false
+      }
+      if (up === 0 || down === 0) {
+        fs.writeFile(filename, volumeLevel, (err) => {
+          if (err) throw err
+        })
+      }
+      loudness.setVolume(volumeLevels[volumeLevel], function(err) {
         if (err) throw err
       })
     }, 100)
+
+    // Language
     setInterval(function() {
       var pin = fs.readFileSync(GPIO_PATH + '/gpio22/value').toString().replace(/\n$/, '')
       var langs = ['en', 'es']
