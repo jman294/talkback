@@ -58,34 +58,36 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
     })
 
     var filename = os.homedir() + '/.talkbackvolume'
-    var volumeLevels = [25, 40, 55, 70, 85]
+    var volumeLevels = [25, 40, 55, 56, 100]
     var volumeLevel = 3
     if (fs.existsSync(filename)) {
-      volumeLevel = parseInt(fs.readFileSync(filename))
+      try {
+        volumeLevel = parseInt(fs.readFileSync(filename))
+      } catch (e) {
+        // keep volume level at 3
+      }
     } else {
       fs.writeFileSync(ilename, volumeLevel, (err) => {
         if (err) throw err
       })
     }
-    var buttonPressed = false
+    var buttonPressed = true
 
     setInterval(function() {
       var up = parseInt(fs.readFileSync(GPIO_PATH + '/gpio6/value'))
       var down = parseInt(fs.readFileSync(GPIO_PATH + '/gpio13/value'))
-      if (up === 0 && !buttonPressed) {
+      if (down === 0 && !buttonPressed) {
+        buttonPressed = true
+        if (volumeLevel < volumeLevels.length) {
+          volumeLevel -= 1
+        }
+        tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
+      } else if (up === 0 && !buttonPressed) {
         buttonPressed = true
         if (volumeLevel < volumeLevels.length) {
           volumeLevel += 1
         }
         tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
-      } else if (down === 0 && !buttonPressed) {
-        buttonPressed = true
-        if (volumeLevel > 0) {
-          volumeLevel -= 1
-        }
-        tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
-      } else if (up === 1 && down === 1) {
-        buttonPressed = false
       }
       if (up === 0 || down === 0) {
         fs.writeFile(filename, volumeLevel, (err) => {
