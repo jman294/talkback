@@ -67,7 +67,7 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
         // keep volume level at 3
       }
     } else {
-      fs.writeFileSync(ilename, volumeLevel, (err) => {
+      fs.writeFileSync(filename, volumeLevel, (err) => {
         if (err) throw err
       })
     }
@@ -78,7 +78,7 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
       var down = parseInt(fs.readFileSync(GPIO_PATH + '/gpio13/value'))
       if (down === 0 && !buttonPressed) {
         buttonPressed = true
-        if (volumeLevel < volumeLevels.length) {
+        if (volumeLevel > 0) {
           volumeLevel -= 1
         }
         tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
@@ -88,6 +88,8 @@ fs.readFile('/proc/cpuinfo', function(err, data) {
           volumeLevel += 1
         }
         tts.speak('Volume level ' + (volumeLevel+1), talkback.lang)
+      } else if (down === 1 && up === 1) {
+        buttonPressed = false
       }
       if (up === 0 || down === 0) {
         fs.writeFile(filename, volumeLevel, (err) => {
